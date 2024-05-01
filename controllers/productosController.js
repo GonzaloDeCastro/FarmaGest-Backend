@@ -1,7 +1,7 @@
 const Producto = require("../models/productosModel");
 
 const productosController = {
-  obtenerTodos: function (req, res) {
+  obtenerTodos: (req, res) => {
     Producto.obtenerTodos((err, productos) => {
       if (err) throw err;
       res.json(productos);
@@ -22,7 +22,6 @@ const productosController = {
       res.send("Producto creado exitosamente");
     });
   },
-
   // Implementar más funciones controladoras según sea necesario (actualizar, eliminar, etc.)
 };
 

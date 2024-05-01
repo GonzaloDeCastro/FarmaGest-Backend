@@ -1,19 +1,21 @@
 const db = require("../db");
 
-// Modelo de Producto
-const Producto = {
-  // Obtener todos los productos
-  obtenerTodos: function (callback) {
+class Producto {
+  constructor(nombre_producto, precio, cantidad) {
+    this.nombre_producto = nombre_producto;
+    this.precio = precio;
+    this.cantidad = cantidad;
+  }
+
+  static obtenerTodos(callback) {
     return db.query("SELECT * FROM productos", callback);
-  },
+  }
 
-  // Obtener un producto por su ID
-  obtenerPorId: function (id, callback) {
+  static obtenerPorId(id, callback) {
     return db.query("SELECT * FROM productos WHERE id = ?", [id], callback);
-  },
+  }
 
-  // Crear un nuevo producto
-  crear: function (nuevoProducto, callback) {
+  static crear(nuevoProducto, callback) {
     return db.query(
       "INSERT INTO productos (nombre_producto, precio, cantidad) VALUES (?, ?, ?)",
       [
@@ -23,21 +25,19 @@ const Producto = {
       ],
       callback
     );
-  },
+  }
 
-  // Actualizar un producto existente
-  actualizar: function (id, producto, callback) {
+  static actualizar(id, producto, callback) {
     return db.query(
       "UPDATE productos SET nombre_producto = ?, precio = ?, cantidad = ? WHERE id = ?",
       [producto.nombre_producto, producto.precio, producto.cantidad, id],
       callback
     );
-  },
+  }
 
-  // Eliminar un producto
-  eliminar: function (id, callback) {
+  static eliminar(id, callback) {
     return db.query("DELETE FROM productos WHERE id = ?", [id], callback);
-  },
-};
+  }
+}
 
 module.exports = Producto;

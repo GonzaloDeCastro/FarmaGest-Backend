@@ -4,7 +4,7 @@ const productosController = require("../controllers/productosController.js");
 
 module.exports = () => {
   router.get("/all", productosController.obtenerTodos);
-  router.put("/:id", productosController.obtenerPorId);
+  router.get("/:id", productosController.obtenerPorId);
   router.post("/", productosController.crear);
   return router;
 };
