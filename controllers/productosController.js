@@ -22,7 +22,13 @@ const productosController = {
       res.send("Producto creado exitosamente");
     });
   },
-  // Implementar más funciones controladoras según sea necesario (actualizar, eliminar, etc.)
+
+  eliminar: function (req, res) {
+    Producto.eliminar(req.params.id, (err, producto) => {
+      if (err) throw err;
+      res.json(producto);
+    });
+  },
 };
 
 module.exports = productosController;

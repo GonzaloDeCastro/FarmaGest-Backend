@@ -8,7 +8,12 @@ class Producto {
   }
 
   static obtenerTodos(callback) {
-    return db.query("SELECT * FROM productos", callback);
+    return db.query(
+      `
+    SELECT id, nombre_producto as Producto, precio as Precio, cantidad as Cantidad
+    FROM productos`,
+      callback
+    );
   }
 
   static obtenerPorId(id, callback) {
