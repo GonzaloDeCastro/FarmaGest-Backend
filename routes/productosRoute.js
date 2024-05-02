@@ -5,6 +5,7 @@ const productosController = require("../controllers/productosController.js");
 module.exports = () => {
   router.get("/all", productosController.obtenerTodos);
   router.get("/:id", productosController.obtenerPorId);
+  router.put("/:id", productosController.actualizar);
   router.post("/", productosController.crear);
   router.delete("/:id", productosController.eliminar);
   return router;

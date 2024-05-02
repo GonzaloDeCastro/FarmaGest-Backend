@@ -19,10 +19,17 @@ const productosController = {
     const nuevoProducto = req.body;
     Producto.crear(nuevoProducto, (err, resultado) => {
       if (err) throw err;
-      res.send("Producto creado exitosamente");
+      res.send(resultado);
     });
   },
 
+  actualizar: function (req, res) {
+    const editarProducto = req.body;
+    Producto.actualizar(req.params.id, editarProducto, (err, producto) => {
+      if (err) throw err;
+      res.json(producto);
+    });
+  },
   eliminar: function (req, res) {
     Producto.eliminar(req.params.id, (err, producto) => {
       if (err) throw err;
