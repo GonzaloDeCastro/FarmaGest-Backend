@@ -1,23 +1,28 @@
 const db = require("../db");
 
 class Producto {
-  constructor(nombre_producto, precio, cantidad) {
+  constructor(nombre_producto, precio, cantidad, compania) {
     this.nombre_producto = nombre_producto;
     this.precio = precio;
     this.cantidad = cantidad;
+    this.compania = compania;
   }
 
   static obtenerTodos(callback) {
     return db.query(
       `
-    SELECT id, nombre_producto as Producto, precio as Precio, cantidad as Cantidad
-    FROM productos`,
+    SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  u.compania as Compania
+    FROM productos as p LEFT JOIN usuarios as u on p.proveedor_id = u.usuario_id`,
       callback
     );
   }
 
-  static obtenerPorId(id, callback) {
-    return db.query("SELECT * FROM productos WHERE id = ?", [id], callback);
+  static obtenerPorId(producto_id, callback) {
+    return db.query(
+      "SELECT * FROM productos WHERE producto_id = ?",
+      [producto_id],
+      callback
+    );
   }
 
   static crear(nuevoProducto, callback) {
@@ -32,16 +37,25 @@ class Producto {
     );
   }
 
-  static actualizar(id, producto, callback) {
+  static actualizar(producto_id, producto, callback) {
     return db.query(
-      "UPDATE productos SET nombre_producto = ?, precio = ?, cantidad = ? WHERE id = ?",
-      [producto.nombre_producto, producto.precio, producto.cantidad, id],
+      "UPDATE productos SET nombre_producto = ?, precio = ?, cantidad = ? WHERE producto_id = ?",
+      [
+        producto.nombre_producto,
+        producto.precio,
+        producto.cantidad,
+        producto_id,
+      ],
       callback
     );
   }
 
-  static eliminar(id, callback) {
-    return db.query("DELETE FROM productos WHERE id = ?", [id], callback);
+  static eliminar(producto_id, callback) {
+    return db.query(
+      "DELETE FROM productos WHERE producto_id = ?",
+      [producto_id],
+      callback
+    );
   }
 }
 
