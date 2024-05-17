@@ -12,8 +12,8 @@ class Usuario {
   static obtenerTodos(callback) {
     return db.query(
       `
-    SELECT p.usuario_id, p.nombre_usuario as Usuario, p.precio as Precio, p.cantidad as Cantidad,  u.compania as Compania
-    FROM usuarios as p LEFT JOIN usuarios as u on p.proveedor_id = u.usuario_id`,
+    SELECT usuario_id, nombre as Nombre, apellido as Apellido, correo_electronico as Email,compania as Compania
+    FROM usuarios`,
       callback
     );
   }
@@ -28,16 +28,16 @@ class Usuario {
 
   static crear(nuevoUsuario, callback) {
     return db.query(
-      "INSERT INTO usuarios (nombre_usuario, precio, cantidad) VALUES (?, ?, ?)",
-      [nuevoUsuario.nombre_usuario, nuevoUsuario.precio, nuevoUsuario.cantidad],
+      "INSERT INTO usuarios (nombre, apellido, correo) VALUES (?, ?, ?)",
+      [nuevoUsuario.nombre, nuevoUsuario.apellido, nuevoUsuario.correo],
       callback
     );
   }
 
   static actualizar(usuario_id, usuario, callback) {
     return db.query(
-      "UPDATE usuarios SET nombre_usuario = ?, precio = ?, cantidad = ? WHERE usuario_id = ?",
-      [usuario.nombre_usuario, usuario.precio, usuario.cantidad, usuario_id],
+      "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ? WHERE usuario_id = ?",
+      [usuario.nombre, usuario.apellido, usuario.correo, usuario_id],
       callback
     );
   }

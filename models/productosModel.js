@@ -11,7 +11,7 @@ class Producto {
   static obtenerTodos(callback) {
     return db.query(
       `
-    SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  u.compania as Compania
+    SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  u.usuario_id as UsuarioID, u.compania as Compania
     FROM productos as p LEFT JOIN usuarios as u on p.proveedor_id = u.usuario_id`,
       callback
     );
@@ -27,11 +27,12 @@ class Producto {
 
   static crear(nuevoProducto, callback) {
     return db.query(
-      "INSERT INTO productos (nombre_producto, precio, cantidad) VALUES (?, ?, ?)",
+      "INSERT INTO productos (nombre_producto, precio, cantidad, proveedor_id) VALUES (?, ?, ?, ?)",
       [
         nuevoProducto.nombre_producto,
         nuevoProducto.precio,
         nuevoProducto.cantidad,
+        nuevoProducto.proveedor_id,
       ],
       callback
     );
@@ -39,11 +40,12 @@ class Producto {
 
   static actualizar(producto_id, producto, callback) {
     return db.query(
-      "UPDATE productos SET nombre_producto = ?, precio = ?, cantidad = ? WHERE producto_id = ?",
+      "UPDATE productos SET nombre_producto = ?, precio = ?, cantidad = ?, proveedor_id = ? WHERE producto_id = ?",
       [
         producto.nombre_producto,
         producto.precio,
         producto.cantidad,
+        producto.proveedor_id,
         producto_id,
       ],
       callback
