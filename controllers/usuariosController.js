@@ -8,6 +8,13 @@ const usuariosController = {
     });
   },
 
+  obtenerRoles: (req, res) => {
+    Usuario.obtenerRoles((err, roles) => {
+      if (err) throw err;
+      res.json(roles);
+    });
+  },
+
   obtenerPorId: function (req, res) {
     Usuario.obtenerPorId(req.params.id, (err, usuario) => {
       if (err) throw err;
@@ -17,6 +24,7 @@ const usuariosController = {
 
   crear: function (req, res) {
     const nuevoUsuario = req.body;
+    console.log("nuevoUsuario ", nuevoUsuario);
     Usuario.crear(nuevoUsuario, (err, resultado) => {
       if (err) throw err;
       res.send(resultado);

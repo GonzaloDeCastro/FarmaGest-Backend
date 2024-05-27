@@ -4,6 +4,7 @@ const usuariosController = require("../controllers/usuariosController.js");
 
 module.exports = () => {
   router.get("/all", usuariosController.obtenerTodos);
+  router.get("/roles", usuariosController.obtenerRoles);
   router.get("/:id", usuariosController.obtenerPorId);
   router.put("/:id", usuariosController.actualizar);
   router.post("/", usuariosController.crear);

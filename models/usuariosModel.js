@@ -12,8 +12,20 @@ class Usuario {
   static obtenerTodos(callback) {
     return db.query(
       `
-    SELECT usuario_id, nombre as Nombre, apellido as Apellido, correo_electronico as Email,compania as Compania
-    FROM usuarios`,
+    SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo_electronico as Email,r.descripcion as Rol, u.compania as Compania
+    FROM usuarios AS u 
+    JOIN usuario_roles AS ur ON ur.usuario_id = u.usuario_id
+    JOIN roles AS r ON r.rol_id = ur.rol_id`,
+      callback
+    );
+  }
+
+  static obtenerRoles(callback) {
+    return db.query(
+      `
+    SELECT rol_id, descripcion
+    FROM roles 
+    `,
       callback
     );
   }
@@ -28,15 +40,19 @@ class Usuario {
 
   static crear(nuevoUsuario, callback) {
     return db.query(
-      "INSERT INTO usuarios (nombre, apellido, correo) VALUES (?, ?, ?)",
-      [nuevoUsuario.nombre, nuevoUsuario.apellido, nuevoUsuario.correo],
+      "INSERT INTO usuarios (nombre, apellido, correo_electronico) VALUES (?, ?, ?)",
+      [
+        nuevoUsuario.nombre,
+        nuevoUsuario.apellido,
+        nuevoUsuario.correo_electronico,
+      ],
       callback
     );
   }
 
   static actualizar(usuario_id, usuario, callback) {
     return db.query(
-      "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ? WHERE usuario_id = ?",
+      "UPDATE usuarios SET nombre = ?, apellido = ?, correo_electronico = ? WHERE usuario_id = ?",
       [usuario.nombre, usuario.apellido, usuario.correo, usuario_id],
       callback
     );
