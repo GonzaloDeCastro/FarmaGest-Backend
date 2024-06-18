@@ -8,11 +8,16 @@ class Producto {
     this.compania = compania;
   }
 
-  static obtenerTodos(callback) {
+  static obtenerTodos(page, pageSize, search, callback) {
+    const offset = (page - 1) * pageSize;
+    const searchQuery = search ? `%${search}%` : "%";
     return db.query(
       `
     SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  u.usuario_id as UsuarioID, u.compania as Compania
-    FROM productos as p LEFT JOIN usuarios as u on p.proveedor_id = u.usuario_id`,
+    FROM productos as p LEFT JOIN usuarios as u on p.proveedor_id = u.usuario_id 
+    WHERE p.nombre_producto LIKE ? OR p.precio LIKE ? OR p.cantidad LIKE ? OR u.compania LIKE ?
+      LIMIT ? OFFSET ?;`,
+      [searchQuery, searchQuery, searchQuery, searchQuery, pageSize, offset],
       callback
     );
   }

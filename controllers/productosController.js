@@ -2,7 +2,10 @@ const Producto = require("../models/productosModel");
 
 const productosController = {
   obtenerTodos: (req, res) => {
-    Producto.obtenerTodos((err, productos) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    const search = req.query.search || "";
+    Producto.obtenerTodos(page, pageSize, search, (err, productos) => {
       if (err) throw err;
       res.json(productos);
     });

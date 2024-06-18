@@ -2,7 +2,11 @@ const Usuario = require("../models/usuariosModel");
 
 const usuariosController = {
   obtenerTodos: (req, res) => {
-    Usuario.obtenerTodos((err, usuarios) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    const search = req.query.search || "";
+
+    Usuario.obtenerTodos(page, pageSize, search, (err, usuarios) => {
       if (err) throw err;
       res.json(usuarios);
     });
