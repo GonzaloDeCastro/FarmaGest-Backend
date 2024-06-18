@@ -13,10 +13,13 @@ class Usuario {
     return db.query(
       `
     SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo_electronico as Email,
-    r.rol_id, r.descripcion as Rol, u.cuit, u.compania as Compania
+    r.rol_id, r.descripcion as Rol, u.cuit, u.compania as Compania, os.obra_social, os.codigo
     FROM usuarios AS u 
     JOIN usuario_roles AS ur ON ur.usuario_id = u.usuario_id
-    JOIN roles AS r ON r.rol_id = ur.rol_id`,
+    JOIN roles AS r ON r.rol_id = ur.rol_id
+    LEFT JOIN usuario_obra_social AS uos ON uos.usuario_id = u.usuario_id
+    LEFT JOIN obras_sociales AS os ON os.codigo = uos.codigo;`,
+
       callback
     );
   }
@@ -26,6 +29,15 @@ class Usuario {
       `
     SELECT rol_id, descripcion
     FROM roles 
+    `,
+      callback
+    );
+  }
+  static obtenerObrasSociales(callback) {
+    return db.query(
+      `
+    SELECT codigo, obra_social, plan, descuento
+    FROM obras_sociales 
     `,
       callback
     );
@@ -60,6 +72,13 @@ class Usuario {
       callback
     );
   }
+  static agregarUsuarioOs(usuarioOs, callback) {
+    return db.query(
+      "INSERT INTO usuario_obra_social (usuario_id, codigo) VALUES (?, ?)",
+      [usuarioOs.usuario_id, usuarioOs.codigo],
+      callback
+    );
+  }
 
   static actualizar(usuario_id, usuario, callback) {
     return db.query(
@@ -86,6 +105,13 @@ class Usuario {
   static eliminarUsuarioRol(usuario_id, callback) {
     return db.query(
       "DELETE FROM usuario_roles WHERE usuario_id = ?",
+      [usuario_id],
+      callback
+    );
+  }
+  static eliminarUsuarioOs(usuario_id, callback) {
+    return db.query(
+      "DELETE FROM usuario_obra_social WHERE usuario_id = ?",
       [usuario_id],
       callback
     );

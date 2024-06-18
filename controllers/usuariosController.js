@@ -15,6 +15,13 @@ const usuariosController = {
     });
   },
 
+  obtenerObrasSociales: (req, res) => {
+    Usuario.obtenerObrasSociales((err, roles) => {
+      if (err) throw err;
+      res.json(roles);
+    });
+  },
+
   obtenerPorId: function (req, res) {
     Usuario.obtenerPorId(req.params.id, (err, usuario) => {
       if (err) throw err;
@@ -38,6 +45,13 @@ const usuariosController = {
       res.send(resultado);
     });
   },
+  agregarUsuarioOs: function (req, res) {
+    const nuevoUsuarioOs = req.body;
+    Usuario.agregarUsuarioOs(nuevoUsuarioOs, (err, resultado) => {
+      if (err) throw err;
+      res.send(resultado);
+    });
+  },
 
   actualizar: function (req, res) {
     const editarUsuario = req.body;
@@ -54,6 +68,13 @@ const usuariosController = {
   },
   eliminarUsuarioRol: function (req, res) {
     Usuario.eliminarUsuarioRol(req.params.id, (err, usuario) => {
+      if (err) throw err;
+      res.json(usuario);
+    });
+  },
+
+  eliminarUsuarioOs: function (req, res) {
+    Usuario.eliminarUsuarioOs(req.params.id, (err, usuario) => {
       if (err) throw err;
       res.json(usuario);
     });
