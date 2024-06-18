@@ -5,8 +5,9 @@ const usuariosController = {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
+    const rolID = req.query.rolID || 0;
 
-    Usuario.obtenerTodos(page, pageSize, search, (err, usuarios) => {
+    Usuario.obtenerTodos(page, pageSize, search, rolID, (err, usuarios) => {
       if (err) throw err;
       res.json(usuarios);
     });
