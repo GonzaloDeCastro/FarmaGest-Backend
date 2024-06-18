@@ -12,7 +12,8 @@ class Usuario {
   static obtenerTodos(callback) {
     return db.query(
       `
-    SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo_electronico as Email,r.descripcion as Rol, u.compania as Compania
+    SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo_electronico as Email,
+    r.rol_id, r.descripcion as Rol, u.cuit, u.compania as Compania
     FROM usuarios AS u 
     JOIN usuario_roles AS ur ON ur.usuario_id = u.usuario_id
     JOIN roles AS r ON r.rol_id = ur.rol_id`,
@@ -40,20 +41,37 @@ class Usuario {
 
   static crear(nuevoUsuario, callback) {
     return db.query(
-      "INSERT INTO usuarios (nombre, apellido, correo_electronico) VALUES (?, ?, ?)",
+      "INSERT INTO usuarios (nombre, apellido, correo_electronico, compania, cuit) VALUES (?, ?, ?, ? ,?)",
       [
         nuevoUsuario.nombre,
         nuevoUsuario.apellido,
         nuevoUsuario.correo_electronico,
+        nuevoUsuario.compania,
+        nuevoUsuario.cuit,
       ],
+      callback
+    );
+  }
+
+  static agregarUsuarioRol(usuarioRol, callback) {
+    return db.query(
+      "INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (?, ?)",
+      [usuarioRol.usuario_id, usuarioRol.rol_id],
       callback
     );
   }
 
   static actualizar(usuario_id, usuario, callback) {
     return db.query(
-      "UPDATE usuarios SET nombre = ?, apellido = ?, correo_electronico = ? WHERE usuario_id = ?",
-      [usuario.nombre, usuario.apellido, usuario.correo, usuario_id],
+      "UPDATE usuarios SET nombre = ?, apellido = ?, correo_electronico = ?, compania = ?, cuit= ? WHERE usuario_id = ?",
+      [
+        usuario.nombre,
+        usuario.apellido,
+        usuario.correo_electronico,
+        usuario.compania,
+        usuario.cuit,
+        parseInt(usuario_id),
+      ],
       callback
     );
   }
@@ -61,6 +79,13 @@ class Usuario {
   static eliminar(usuario_id, callback) {
     return db.query(
       "DELETE FROM usuarios WHERE usuario_id = ?",
+      [usuario_id],
+      callback
+    );
+  }
+  static eliminarUsuarioRol(usuario_id, callback) {
+    return db.query(
+      "DELETE FROM usuario_roles WHERE usuario_id = ?",
       [usuario_id],
       callback
     );

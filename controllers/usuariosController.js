@@ -24,8 +24,16 @@ const usuariosController = {
 
   crear: function (req, res) {
     const nuevoUsuario = req.body;
-    console.log("nuevoUsuario ", nuevoUsuario);
+
     Usuario.crear(nuevoUsuario, (err, resultado) => {
+      if (err) throw err;
+      res.send(resultado);
+    });
+  },
+
+  agregarUsuarioRol: function (req, res) {
+    const nuevoUsuarioRol = req.body;
+    Usuario.agregarUsuarioRol(nuevoUsuarioRol, (err, resultado) => {
       if (err) throw err;
       res.send(resultado);
     });
@@ -40,6 +48,12 @@ const usuariosController = {
   },
   eliminar: function (req, res) {
     Usuario.eliminar(req.params.id, (err, usuario) => {
+      if (err) throw err;
+      res.json(usuario);
+    });
+  },
+  eliminarUsuarioRol: function (req, res) {
+    Usuario.eliminarUsuarioRol(req.params.id, (err, usuario) => {
       if (err) throw err;
       res.json(usuario);
     });
