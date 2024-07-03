@@ -27,6 +27,13 @@ const usuariosController = {
     });
   },
 
+  obtenerCompanias: (req, res) => {
+    Usuario.obtenerCompanias((err, roles) => {
+      if (err) throw err;
+      res.json(roles);
+    });
+  },
+
   obtenerPorId: function (req, res) {
     Usuario.obtenerPorId(req.params.id, (err, usuario) => {
       if (err) throw err;
@@ -53,6 +60,14 @@ const usuariosController = {
   agregarUsuarioOs: function (req, res) {
     const nuevoUsuarioOs = req.body;
     Usuario.agregarUsuarioOs(nuevoUsuarioOs, (err, resultado) => {
+      if (err) throw err;
+      res.send(resultado);
+    });
+  },
+  agregarUsuarioCompania: function (req, res) {
+    const nuevoUsuarioCompania = req.body;
+
+    Usuario.agregarUsuarioCompania(nuevoUsuarioCompania, (err, resultado) => {
       if (err) throw err;
       res.send(resultado);
     });

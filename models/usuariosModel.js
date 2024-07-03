@@ -5,8 +5,6 @@ class Usuario {
     this.nombre = nombre;
     this.apellido = apellido;
     this.correo_electronico = correo_electronico;
-    this.compania = compania;
-    this.cuit = cuit;
   }
 
   static obtenerTodos(page, pageSize, search, rolID, callback) {
@@ -15,13 +13,15 @@ class Usuario {
 
     let query = `
     SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo_electronico as Email,
-    r.rol_id, r.descripcion as Rol, u.cuit, u.compania as Compania, 
+    r.rol_id, r.descripcion as Rol, c.cuit, c.compania as Compania, 
     COALESCE(os.obra_social, '-') as obra_social, os.codigo
     FROM usuarios AS u 
     JOIN usuario_roles AS ur ON ur.usuario_id = u.usuario_id
     JOIN roles AS r ON r.rol_id = ur.rol_id
     LEFT JOIN usuario_obra_social AS uos ON uos.usuario_id = u.usuario_id
     LEFT JOIN obras_sociales AS os ON os.codigo = uos.codigo
+    LEFT JOIN usuario_compania AS uc ON uc.usuario_id = u.usuario_id
+    LEFT JOIN companias AS c ON c.compania_id = uc.compania_id
     WHERE (u.nombre LIKE ? OR u.apellido LIKE ? OR u.correo_electronico LIKE ?)
   `;
 
@@ -57,6 +57,16 @@ class Usuario {
     );
   }
 
+  static obtenerCompanias(callback) {
+    return db.query(
+      `
+    SELECT compania_id,compania, cuit
+    FROM companias 
+    `,
+      callback
+    );
+  }
+
   static obtenerPorId(usuario_id, callback) {
     return db.query(
       "SELECT * FROM usuarios WHERE usuario_id = ?",
@@ -67,13 +77,11 @@ class Usuario {
 
   static crear(nuevoUsuario, callback) {
     return db.query(
-      "INSERT INTO usuarios (nombre, apellido, correo_electronico, compania, cuit) VALUES (?, ?, ?, ? ,?)",
+      "INSERT INTO usuarios (nombre, apellido, correo_electronico) VALUES (?, ?, ?)",
       [
         nuevoUsuario.nombre,
         nuevoUsuario.apellido,
         nuevoUsuario.correo_electronico,
-        nuevoUsuario.compania,
-        nuevoUsuario.cuit,
       ],
       callback
     );
@@ -90,6 +98,14 @@ class Usuario {
     return db.query(
       "INSERT INTO usuario_obra_social (usuario_id, codigo) VALUES (?, ?)",
       [usuarioOs.usuario_id, usuarioOs.codigo],
+      callback
+    );
+  }
+
+  static agregarUsuarioCompania(usuarioCompania, callback) {
+    return db.query(
+      "INSERT INTO usuario_compania (usuario_id, compania_id) VALUES (?, ?)",
+      [usuarioCompania.usuario_id, usuarioCompania.compania_id],
       callback
     );
   }

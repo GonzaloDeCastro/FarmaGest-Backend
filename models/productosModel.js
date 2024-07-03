@@ -13,9 +13,12 @@ class Producto {
     const searchQuery = search ? `%${search}%` : "%";
     return db.query(
       `
-    SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  u.usuario_id as UsuarioID, u.compania as Compania
-    FROM productos as p LEFT JOIN usuarios as u on p.proveedor_id = u.usuario_id 
-    WHERE p.nombre_producto LIKE ? OR p.precio LIKE ? OR p.cantidad LIKE ? OR u.compania LIKE ?
+    SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  uc.usuario_id as UsuarioID, c.compania as Compania
+    FROM productos as p 
+    LEFT JOIN usuario_compania as uc on p.proveedor_id = uc.usuario_id
+    LEFT JOIN companias as c on c.compania_id = uc.compania_id 
+    
+    WHERE p.nombre_producto LIKE ? OR p.precio LIKE ? OR p.cantidad LIKE ? OR c.compania LIKE ?
       LIMIT ? OFFSET ?;`,
       [searchQuery, searchQuery, searchQuery, searchQuery, pageSize, offset],
       callback

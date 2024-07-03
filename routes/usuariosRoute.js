@@ -6,6 +6,7 @@ module.exports = () => {
   router.get("/all", usuariosController.obtenerTodos);
   router.get("/roles", usuariosController.obtenerRoles);
   router.get("/obras-sociales", usuariosController.obtenerObrasSociales);
+  router.get("/companias", usuariosController.obtenerCompanias);
   router.get("/:id", usuariosController.obtenerPorId);
 
   router.put("/:id", usuariosController.actualizar);
@@ -13,6 +14,7 @@ module.exports = () => {
   router.post("/", usuariosController.crear);
   router.post("/rol", usuariosController.agregarUsuarioRol);
   router.post("/obra-social", usuariosController.agregarUsuarioOs);
+  router.post("/compania", usuariosController.agregarUsuarioCompania);
 
   router.delete("/:id", usuariosController.eliminar);
   router.delete("/rol/:id", usuariosController.eliminarUsuarioRol);
