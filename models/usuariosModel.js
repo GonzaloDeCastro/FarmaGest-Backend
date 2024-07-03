@@ -13,7 +13,7 @@ class Usuario {
 
     let query = `
     SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo_electronico as Email,
-    r.rol_id, r.descripcion as Rol, c.cuit, c.compania as Compania, 
+    r.rol_id, r.descripcion as Rol, c.compania as Compania, c.compania_id,
     COALESCE(os.obra_social, '-') as obra_social, os.codigo
     FROM usuarios AS u 
     JOIN usuario_roles AS ur ON ur.usuario_id = u.usuario_id
@@ -112,13 +112,11 @@ class Usuario {
 
   static actualizar(usuario_id, usuario, callback) {
     return db.query(
-      "UPDATE usuarios SET nombre = ?, apellido = ?, correo_electronico = ?, compania = ?, cuit= ? WHERE usuario_id = ?",
+      "UPDATE usuarios SET nombre = ?, apellido = ?, correo_electronico = ? WHERE usuario_id = ?",
       [
         usuario.nombre,
         usuario.apellido,
         usuario.correo_electronico,
-        usuario.compania,
-        usuario.cuit,
         parseInt(usuario_id),
       ],
       callback
@@ -142,6 +140,13 @@ class Usuario {
   static eliminarUsuarioOs(usuario_id, callback) {
     return db.query(
       "DELETE FROM usuario_obra_social WHERE usuario_id = ?",
+      [usuario_id],
+      callback
+    );
+  }
+  static eliminarUsuarioCompania(usuario_id, callback) {
+    return db.query(
+      "DELETE FROM usuario_compania WHERE usuario_id = ?",
       [usuario_id],
       callback
     );

@@ -99,6 +99,13 @@ const usuariosController = {
       res.json(usuario);
     });
   },
+
+  eliminarUsuarioCompania: function (req, res) {
+    Usuario.eliminarUsuarioCompania(req.params.id, (err, usuario) => {
+      if (err) throw err;
+      res.json(usuario);
+    });
+  },
 };
 
 module.exports = usuariosController;

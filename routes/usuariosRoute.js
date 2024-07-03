@@ -19,5 +19,6 @@ module.exports = () => {
   router.delete("/:id", usuariosController.eliminar);
   router.delete("/rol/:id", usuariosController.eliminarUsuarioRol);
   router.delete("/obra-social/:id", usuariosController.eliminarUsuarioOs);
+  router.delete("/compania/:id", usuariosController.eliminarUsuarioCompania);
   return router;
 };
