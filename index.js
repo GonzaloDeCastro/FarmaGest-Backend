@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 // Rutas
-app.use("/", routes); // Monta las rutas definidas en routes.js en el endpoint '/'
+app.use("/api", routes); // Monta las rutas definidas en routes.js en el endpoint '/'
 
 // Iniciar el servidor
 app.listen(port, () => {

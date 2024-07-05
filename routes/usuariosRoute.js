@@ -1,24 +1,22 @@
+// routes/usuariosRoutes.js
+
 const express = require("express");
 const router = express.Router();
-const usuariosController = require("../controllers/usuariosController.js");
+const usuariosController = require("../controllers/usuariosController");
 
 module.exports = () => {
-  router.get("/all", usuariosController.obtenerTodos);
+  // Obtener todos los usuarios
+  router.get("/", usuariosController.obtenerUsuarios);
   router.get("/roles", usuariosController.obtenerRoles);
-  router.get("/obras-sociales", usuariosController.obtenerObrasSociales);
-  router.get("/companias", usuariosController.obtenerCompanias);
-  router.get("/:id", usuariosController.obtenerPorId);
 
-  router.put("/:id", usuariosController.actualizar);
+  // Agregar un nuevo usuario
+  router.post("/", usuariosController.agregarUsuario);
 
-  router.post("/", usuariosController.crear);
-  router.post("/rol", usuariosController.agregarUsuarioRol);
-  router.post("/obra-social", usuariosController.agregarUsuarioOs);
-  router.post("/compania", usuariosController.agregarUsuarioCompania);
+  // Actualizar un usuario existente
+  router.put("/:id", usuariosController.actualizarUsuario);
 
-  router.delete("/:id", usuariosController.eliminar);
-  router.delete("/rol/:id", usuariosController.eliminarUsuarioRol);
-  router.delete("/obra-social/:id", usuariosController.eliminarUsuarioOs);
-  router.delete("/compania/:id", usuariosController.eliminarUsuarioCompania);
+  // Eliminar un usuario existente
+  router.delete("/:id", usuariosController.eliminarUsuario);
+
   return router;
 };

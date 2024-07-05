@@ -1,42 +1,86 @@
 const Producto = require("../models/productosModel");
 
 const productosController = {
-  obtenerTodos: (req, res) => {
+  obtenerProductos: (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
-    Producto.obtenerTodos(page, pageSize, search, (err, productos) => {
-      if (err) throw err;
-      res.json(productos);
+
+    Producto.obtenerProductos(page, pageSize, search, (err, productos) => {
+      if (err) {
+        console.error("Error al obtener productos:", err);
+        res.status(500).json({ mensaje: "Error al obtener productos" });
+      } else {
+        res.json(productos);
+      }
     });
   },
 
-  obtenerPorId: function (req, res) {
-    Producto.obtenerPorId(req.params.id, (err, producto) => {
-      if (err) throw err;
-      res.json(producto);
+  agregarProducto: (req, res) => {
+    const { nombre, codigo, marca, categoria_id, stock, precio } = req.body;
+    const nuevoProducto = new Producto(
+      nombre,
+      codigo,
+      marca,
+      categoria_id,
+      stock,
+      precio
+    );
+
+    Producto.agregarProducto(nuevoProducto, (err, resultado) => {
+      if (err) {
+        console.error("Error al agregar producto:", err);
+        res.status(500).json({ mensaje: "Error al agregar producto" });
+      } else {
+        res.status(201).json({
+          mensaje: "Producto agregado correctamente",
+          producto_id: resultado.insertId,
+        });
+      }
     });
   },
 
-  crear: function (req, res) {
-    const nuevoProducto = req.body;
-    Producto.crear(nuevoProducto, (err, resultado) => {
-      if (err) throw err;
-      res.send(resultado);
-    });
-  },
-
-  actualizar: function (req, res) {
+  actualizarProducto: (req, res) => {
     const editarProducto = req.body;
-    Producto.actualizar(req.params.id, editarProducto, (err, producto) => {
-      if (err) throw err;
-      res.json(producto);
+    Producto.actualizarProducto(
+      req.params.id,
+      editarProducto,
+      (err, producto) => {
+        if (err) {
+          console.error("Error al actualizar producto:", err);
+          res.status(500).json({ mensaje: "Error al actualizar producto" });
+        } else {
+          res.json(producto);
+        }
+      }
+    );
+  },
+
+  eliminarProducto: (req, res) => {
+    const productoID = req.params.id;
+
+    Producto.eliminarProducto(productoID, (err, resultado) => {
+      if (err) {
+        console.error("Error al eliminar producto:", err);
+        res.status(500).json({ mensaje: "Error al eliminar producto" });
+      } else {
+        if (resultado.affectedRows > 0) {
+          res.json({ mensaje: "Producto eliminado correctamente" });
+        } else {
+          res.status(404).json({ mensaje: "Producto no encontrado" });
+        }
+      }
     });
   },
-  eliminar: function (req, res) {
-    Producto.eliminar(req.params.id, (err, producto) => {
-      if (err) throw err;
-      res.json(producto);
+
+  obtenerCategorias: (req, res) => {
+    Producto.obtenerCategorias((err, categorias) => {
+      if (err) {
+        console.error("Error al obtener categorías:", err);
+        res.status(500).json({ mensaje: "Error al obtener categorías" });
+      } else {
+        res.json(categorias);
+      }
     });
   },
 };

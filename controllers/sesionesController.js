@@ -1,4 +1,4 @@
-const pool = require("../db");
+/* const pool = require("../db");
 const bcrypt = require("bcrypt");
 
 exports.getUserSession = async (req, res) => {
@@ -35,7 +35,7 @@ exports.getLogin = async (req, res) => {
     // Usar parámetros de consulta para prevenir inyección SQL
     const result = await client.query(
       `SELECT u.usuario_id, u.password_hash FROM usuarios as u 
-    WHERE u.correo_electronico = $1;`,
+    WHERE u.correo = $1;`,
       [username]
     );
 
@@ -119,3 +119,4 @@ exports.logoutSession = async (req, res) => {
     }
   }
 };
+ */

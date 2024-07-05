@@ -1,71 +1,74 @@
 const db = require("../db");
 
 class Producto {
-  constructor(nombre_producto, precio, cantidad, compania) {
-    this.nombre_producto = nombre_producto;
+  constructor(nombre, codigo, marca, categoria_id, stock, precio) {
+    this.nombre = nombre;
+    this.codigo = codigo;
+    this.marca = marca;
+    this.categoria_id = categoria_id;
+    this.stock = stock;
     this.precio = precio;
-    this.cantidad = cantidad;
-    this.compania = compania;
   }
 
-  static obtenerTodos(page, pageSize, search, callback) {
+  static obtenerProductos(page = 0, pageSize = 6, search = "", callback) {
     const offset = (page - 1) * pageSize;
     const searchQuery = search ? `%${search}%` : "%";
-    return db.query(
-      `
-    SELECT p.producto_id, p.nombre_producto as Producto, p.precio as Precio, p.cantidad as Cantidad,  uc.usuario_id as UsuarioID, c.compania as Compania
-    FROM productos as p 
-    LEFT JOIN usuario_compania as uc on p.proveedor_id = uc.usuario_id
-    LEFT JOIN companias as c on c.compania_id = uc.compania_id 
-    
-    WHERE p.nombre_producto LIKE ? OR p.precio LIKE ? OR p.cantidad LIKE ? OR c.compania LIKE ?
-      LIMIT ? OFFSET ?;`,
-      [searchQuery, searchQuery, searchQuery, searchQuery, pageSize, offset],
-      callback
-    );
+
+    let query = `
+      SELECT p.producto_id, p.nombre as Nombre, p.codigo as Codigo, p.marca as Marca, p.stock as Stock, p.precio as Precio, c.categoria_id, c.nombre as Categoria 
+      FROM productos as p
+      LEFT JOIN categorias as c on c.categoria_id = p.categoria_id
+      WHERE (p.nombre LIKE ? OR p.codigo LIKE ? OR p.marca LIKE ?)
+    `;
+
+    const params = [searchQuery, searchQuery, searchQuery];
+    query += ` LIMIT ? OFFSET ?`;
+    params.push(pageSize, offset);
+
+    return db.query(query, params, callback);
   }
 
-  static obtenerPorId(producto_id, callback) {
+  static agregarProducto(nuevoProducto, callback) {
     return db.query(
-      "SELECT * FROM productos WHERE producto_id = ?",
-      [producto_id],
-      callback
-    );
-  }
-
-  static crear(nuevoProducto, callback) {
-    return db.query(
-      "INSERT INTO productos (nombre_producto, precio, cantidad, proveedor_id) VALUES (?, ?, ?, ?)",
+      "INSERT INTO productos (nombre, codigo, marca, categoria_id, stock, precio) VALUES (?, ?, ?, ?, ?,?)",
       [
-        nuevoProducto.nombre_producto,
+        nuevoProducto.nombre,
+        nuevoProducto.codigo,
+        nuevoProducto.marca,
+        nuevoProducto.categoria_id,
+        nuevoProducto.stock,
         nuevoProducto.precio,
-        nuevoProducto.cantidad,
-        nuevoProducto.proveedor_id,
       ],
       callback
     );
   }
 
-  static actualizar(producto_id, producto, callback) {
+  static actualizarProducto(producto_id, producto, callback) {
     return db.query(
-      "UPDATE productos SET nombre_producto = ?, precio = ?, cantidad = ?, proveedor_id = ? WHERE producto_id = ?",
+      "UPDATE productos SET nombre = ?, codigo = ?, marca = ?, categoria_id = ?, stock = ? ,precio = ? WHERE producto_id = ?",
       [
-        producto.nombre_producto,
+        producto.nombre,
+        producto.codigo,
+        producto.marca,
+        producto.categoria_id,
+        producto.stock,
         producto.precio,
-        producto.cantidad,
-        producto.proveedor_id,
-        producto_id,
+        parseInt(producto_id),
       ],
       callback
     );
   }
 
-  static eliminar(producto_id, callback) {
+  static eliminarProducto(producto_id, callback) {
     return db.query(
       "DELETE FROM productos WHERE producto_id = ?",
       [producto_id],
       callback
     );
+  }
+
+  static obtenerCategorias(callback) {
+    return db.query("SELECT categoria_id, nombre FROM categorias", callback);
   }
 }
 

@@ -1,15 +1,61 @@
 const Usuario = require("../models/usuariosModel");
 
 const usuariosController = {
-  obtenerTodos: (req, res) => {
+  obtenerUsuarios: (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
     const rolID = req.query.rolID || 0;
 
-    Usuario.obtenerTodos(page, pageSize, search, rolID, (err, usuarios) => {
+    Usuario.obtenerUsuarios(page, pageSize, search, rolID, (err, usuarios) => {
+      if (err) {
+        console.error("Error al obtener usuarios:", err);
+        res.status(500).json({ mensaje: "Error al obtener usuarios" });
+      } else {
+        res.json(usuarios);
+      }
+    });
+  },
+
+  agregarUsuario: (req, res) => {
+    const { nombre, apellido, correo, rol_id } = req.body;
+    const nuevoUsuario = new Usuario(nombre, apellido, correo, rol_id);
+
+    Usuario.agregarUsuario(nuevoUsuario, (err, resultado) => {
+      if (err) {
+        console.error("Error al agregar usuario:", err);
+        res.status(500).json({ mensaje: "Error al agregar usuario" });
+      } else {
+        res.status(201).json({
+          mensaje: "Usuario agregado correctamente",
+          usuario_id: resultado.insertId,
+        });
+      }
+    });
+  },
+
+  actualizarUsuario: (req, res) => {
+    const editarUsuario = req.body;
+    Usuario.actualizarUsuario(req.params.id, editarUsuario, (err, usuario) => {
       if (err) throw err;
-      res.json(usuarios);
+      res.json(usuario);
+    });
+  },
+
+  eliminarUsuario: (req, res) => {
+    const usuarioID = req.params.id; // Obtener el ID del usuario desde los parámetros de la URL
+
+    Usuario.eliminarUsuario(usuarioID, (err, resultado) => {
+      if (err) {
+        console.error("Error al eliminar usuario:", err);
+        res.status(500).json({ mensaje: "Error al eliminar usuario" });
+      } else {
+        if (resultado.affectedRows > 0) {
+          res.json({ mensaje: "Usuario eliminado correctamente" });
+        } else {
+          res.status(404).json({ mensaje: "Usuario no encontrado" });
+        }
+      }
     });
   },
 
@@ -17,93 +63,6 @@ const usuariosController = {
     Usuario.obtenerRoles((err, roles) => {
       if (err) throw err;
       res.json(roles);
-    });
-  },
-
-  obtenerObrasSociales: (req, res) => {
-    Usuario.obtenerObrasSociales((err, roles) => {
-      if (err) throw err;
-      res.json(roles);
-    });
-  },
-
-  obtenerCompanias: (req, res) => {
-    Usuario.obtenerCompanias((err, roles) => {
-      if (err) throw err;
-      res.json(roles);
-    });
-  },
-
-  obtenerPorId: function (req, res) {
-    Usuario.obtenerPorId(req.params.id, (err, usuario) => {
-      if (err) throw err;
-      res.json(usuario);
-    });
-  },
-
-  crear: function (req, res) {
-    const nuevoUsuario = req.body;
-
-    Usuario.crear(nuevoUsuario, (err, resultado) => {
-      if (err) throw err;
-      res.send(resultado);
-    });
-  },
-
-  agregarUsuarioRol: function (req, res) {
-    const nuevoUsuarioRol = req.body;
-    Usuario.agregarUsuarioRol(nuevoUsuarioRol, (err, resultado) => {
-      if (err) throw err;
-      res.send(resultado);
-    });
-  },
-  agregarUsuarioOs: function (req, res) {
-    const nuevoUsuarioOs = req.body;
-    Usuario.agregarUsuarioOs(nuevoUsuarioOs, (err, resultado) => {
-      if (err) throw err;
-      res.send(resultado);
-    });
-  },
-  agregarUsuarioCompania: function (req, res) {
-    const nuevoUsuarioCompania = req.body;
-
-    Usuario.agregarUsuarioCompania(nuevoUsuarioCompania, (err, resultado) => {
-      if (err) throw err;
-      res.send(resultado);
-    });
-  },
-
-  actualizar: function (req, res) {
-    const editarUsuario = req.body;
-    Usuario.actualizar(req.params.id, editarUsuario, (err, usuario) => {
-      if (err) throw err;
-      res.json(usuario);
-    });
-  },
-  eliminar: function (req, res) {
-    Usuario.eliminar(req.params.id, (err, usuario) => {
-      if (err) throw err;
-      res.json(usuario);
-    });
-  },
-  eliminarUsuarioRol: function (req, res) {
-    Usuario.eliminarUsuarioRol(req.params.id, (err, usuario) => {
-      if (err) throw err;
-      res.json(usuario);
-    });
-  },
-
-  eliminarUsuarioOs: function (req, res) {
-    Usuario.eliminarUsuarioOs(req.params.id, (err, usuario) => {
-      if (err) throw err;
-      res.json(usuario);
-    });
-  },
-
-  eliminarUsuarioCompania: function (req, res) {
-    Usuario.eliminarUsuarioCompania(req.params.id, (err, usuario) => {
-      if (err) throw err;
-      res.json(usuario);
     });
   },
 };
