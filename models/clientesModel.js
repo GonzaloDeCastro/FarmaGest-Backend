@@ -14,7 +14,7 @@ class Cliente {
     const searchQuery = search ? `%${search}%` : "%";
 
     let query = `
-      SELECT c.cliente_id, c.nombre as Nombre, c.apellido as Apellido, c.dni as DNI, o.obra_social_id,o.obra_social as ObraSocial,ci.ciudad_id, ci.ciudad as Ciudad
+      SELECT c.cliente_id, c.nombre as Nombre, c.apellido as Apellido, c.dni as DNI, o.obra_social_id,o.obra_social,ci.ciudad_id, ci.ciudad as Ciudad
       FROM clientes as c
       LEFT JOIN obras_sociales as o on o.obra_social_id = c.obra_social_id
       LEFT JOIN ciudades as ci on ci.ciudad_id = c.ciudad_id
@@ -30,13 +30,13 @@ class Cliente {
 
   static agregarCliente(nuevoCliente, callback) {
     return db.query(
-      "INSERT INTO clientes (nombre, apellido, dni, obrasocial, ciudad) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO clientes (nombre, apellido, dni, obra_social_id, ciudad_id) VALUES (?, ?, ?, ?, ?)",
       [
         nuevoCliente.nombre,
         nuevoCliente.apellido,
         nuevoCliente.dni,
-        nuevoCliente.obrasocial,
-        nuevoCliente.ciudad,
+        nuevoCliente.obra_social_id,
+        nuevoCliente.ciudad_id,
       ],
       callback
     );
@@ -44,13 +44,13 @@ class Cliente {
 
   static actualizarCliente(cliente_id, cliente, callback) {
     return db.query(
-      "UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, obrasocial = ?, ciudad = ? WHERE cliente_id = ?",
+      "UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, obra_social_id = ?, ciudad_id = ? WHERE cliente_id = ?",
       [
         cliente.nombre,
         cliente.apellido,
         cliente.dni,
-        cliente.obrasocial,
-        cliente.ciudad,
+        cliente.obra_social_id,
+        cliente.ciudad_id,
         parseInt(cliente_id),
       ],
       callback
