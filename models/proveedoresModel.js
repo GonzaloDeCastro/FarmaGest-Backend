@@ -10,6 +10,7 @@ class Proveedor {
 
   static obtenerProveedores(page = 0, pageSize = 6, search = "", callback) {
     const offset = (page - 1) * pageSize;
+
     const searchQuery = search ? `%${search}%` : "%";
 
     let query = `

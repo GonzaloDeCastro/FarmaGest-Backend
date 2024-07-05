@@ -2,7 +2,7 @@ const Proveedor = require("../models/proveedoresModel");
 
 const proveedoresController = {
   obtenerProveedores: (req, res) => {
-    const page = parseInt(req.query.page) || 0;
+    const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 7;
     const search = req.query.search || "";
 
