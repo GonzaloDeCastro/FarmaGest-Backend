@@ -65,7 +65,7 @@ exports.getLogin = async (req, res) => {
   }
 };
 
-// Add session
+// Add sesion
 exports.addSession = async (req, res) => {
   const { usuario_id, ip_address, browser } = req.body;
 

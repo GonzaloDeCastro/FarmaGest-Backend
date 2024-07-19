@@ -65,6 +65,20 @@ const usuariosController = {
       res.json(roles);
     });
   },
+
+  validarUsuarioLogin: (req, res) => {
+    const correo = req.query.correo;
+    const contrasena = req.query.contrasena;
+
+    Usuario.validarUsuarioLogin(correo, contrasena, (err, usuarios) => {
+      if (err) {
+        console.error("Error al obtener usuario:", err);
+        res.status(500).json({ mensaje: "Error al obtener usuario" });
+      } else {
+        res.json(usuarios);
+      }
+    });
+  },
 };
 
 module.exports = usuariosController;

@@ -72,6 +72,17 @@ class Usuario {
     );
   }
 
+  static validarUsuarioLogin(correo, contrasena, callback) {
+    return db.query(
+      `
+    SELECT usuario_id, nombre, apellido, correo, estado, rol_id
+    FROM usuarios where correo = ? AND contrasena = ?
+    `,
+      [correo, contrasena],
+      callback
+    );
+  }
+
   static obtenerRoles(callback) {
     return db.query(
       `

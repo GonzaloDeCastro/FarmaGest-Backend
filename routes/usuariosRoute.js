@@ -8,6 +8,7 @@ module.exports = () => {
   // Obtener todos los usuarios
   router.get("/", usuariosController.obtenerUsuarios);
   router.get("/roles", usuariosController.obtenerRoles);
+  router.get("/login", usuariosController.validarUsuarioLogin);
 
   // Agregar un nuevo usuario
   router.post("/", usuariosController.agregarUsuario);
