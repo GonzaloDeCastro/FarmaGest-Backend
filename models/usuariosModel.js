@@ -75,8 +75,28 @@ class Usuario {
   static validarUsuarioLogin(correo, contrasena, callback) {
     return db.query(
       `
-    SELECT usuario_id, nombre, apellido, correo, estado, rol_id
-    FROM usuarios where correo = ? AND contrasena = ?
+    SELECT 
+    u.usuario_id, 
+    u.nombre, 
+    u.apellido, 
+    u.correo, 
+    u.estado, 
+    u.rol_id,
+    r.rol, 
+    GROUP_CONCAT(p.permiso) as permisos
+FROM 
+    usuarios as u
+LEFT JOIN 
+    roles as r on r.rol_id = u.rol_id
+LEFT JOIN 
+    roles_permisos as rp on rp.rol_id = u.rol_id
+LEFT JOIN 
+    permisos as p on p.permiso_id = rp.permiso_id
+WHERE 
+    u.correo = ? 
+    AND u.contrasena = ?
+GROUP BY 
+    u.usuario_id, u.nombre, u.apellido, u.correo, u.estado, u.rol_id;
     `,
       [correo, contrasena],
       callback
