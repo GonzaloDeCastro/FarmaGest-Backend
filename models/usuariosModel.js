@@ -1,11 +1,12 @@
 const db = require("../db");
 
 class Usuario {
-  constructor(nombre, apellido, correo, rol_id) {
+  constructor(nombre, apellido, correo, rol_id, contrasena) {
     this.nombre = nombre;
     this.apellido = apellido;
     this.correo = correo;
     this.rol_id = rol_id;
+    this.contrasena = contrasena;
   }
 
   static obtenerUsuarios(
@@ -36,17 +37,41 @@ class Usuario {
 
     return db.query(query, params, callback);
   }
-
   static agregarUsuario(nuevoUsuario, callback) {
-    return db.query(
-      "INSERT INTO usuarios (nombre, apellido, correo, rol_id, contrasena, estado) VALUES (?, ?, ?, ?, 12345, true)",
-      [
-        nuevoUsuario.nombre,
-        nuevoUsuario.apellido,
-        nuevoUsuario.correo,
-        nuevoUsuario.rol_id,
-      ],
-      callback
+    // Primero, verifica si el correo ya está registrado
+    db.query(
+      "SELECT * FROM usuarios WHERE correo = ?",
+      [nuevoUsuario.correo],
+      (error, results) => {
+        if (error) {
+          console.error("Error al verificar correo:", error);
+          return callback(error);
+        }
+
+        if (results.length > 0) {
+          // Si ya existe un usuario con ese correo, retorna un error
+          return callback(new Error("El correo ya está registrado"));
+        } else {
+          // Si no existe, inserta el nuevo usuario
+          db.query(
+            "INSERT INTO usuarios (nombre, apellido, correo, rol_id, contrasena, estado) VALUES (?, ?, ?, ?, ?, true)",
+            [
+              nuevoUsuario.nombre,
+              nuevoUsuario.apellido,
+              nuevoUsuario.correo,
+              nuevoUsuario.rol_id,
+              nuevoUsuario.contrasena,
+            ],
+            (err, resultado) => {
+              if (err) {
+                console.error("Error al insertar usuario:", err);
+                return callback(err);
+              }
+              callback(null, resultado);
+            }
+          );
+        }
+      }
     );
   }
 
@@ -60,6 +85,14 @@ class Usuario {
         usuario.rol_id,
         parseInt(usuario_id),
       ],
+      callback
+    );
+  }
+
+  static actualizarPassword(usuario_id, usuario, callback) {
+    return db.query(
+      "UPDATE usuarios SET contrasena = ? WHERE correo = ?",
+      [usuario.password, usuario.correo],
       callback
     );
   }

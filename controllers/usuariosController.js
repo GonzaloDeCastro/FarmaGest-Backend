@@ -9,7 +9,6 @@ const usuariosController = {
 
     Usuario.obtenerUsuarios(page, pageSize, search, rolID, (err, usuarios) => {
       if (err) {
-        console.error("Error al obtener usuarios:", err);
         res.status(500).json({ mensaje: "Error al obtener usuarios" });
       } else {
         res.json(usuarios);
@@ -18,13 +17,27 @@ const usuariosController = {
   },
 
   agregarUsuario: (req, res) => {
-    const { nombre, apellido, correo, rol_id } = req.body;
-    const nuevoUsuario = new Usuario(nombre, apellido, correo, rol_id);
+    const { nombre, apellido, correo, rol_id, contrasena } = req.body;
+
+    const nuevoUsuario = new Usuario(
+      nombre,
+      apellido,
+      correo,
+      rol_id,
+      contrasena
+    );
 
     Usuario.agregarUsuario(nuevoUsuario, (err, resultado) => {
       if (err) {
-        console.error("Error al agregar usuario:", err);
-        res.status(500).json({ mensaje: "Error al agregar usuario" });
+        // Determina el tipo de error y ajusta el código de estado
+        let mensajeError = "Error al agregar usuario";
+        let codigoEstado = 500; // Error por defecto
+
+        if (err.message.includes("El correo ya está registrado")) {
+          mensajeError = "El correo ya está registrado";
+          codigoEstado = 409; // Conflicto
+        }
+        res.status(codigoEstado).json({ mensaje: mensajeError });
       } else {
         res.status(201).json({
           mensaje: "Usuario agregado correctamente",
@@ -42,12 +55,23 @@ const usuariosController = {
     });
   },
 
+  actualizarPassword: (req, res) => {
+    const nuevoPassword = req.body;
+
+    Usuario.actualizarPassword(
+      req.params.correo,
+      nuevoPassword,
+      (err, usuario) => {
+        if (err) throw err;
+        res.json(usuario);
+      }
+    );
+  },
   eliminarUsuario: (req, res) => {
     const usuarioID = req.params.id; // Obtener el ID del usuario desde los parámetros de la URL
 
     Usuario.eliminarUsuario(usuarioID, (err, resultado) => {
       if (err) {
-        console.error("Error al eliminar usuario:", err);
         res.status(500).json({ mensaje: "Error al eliminar usuario" });
       } else {
         if (resultado.affectedRows > 0) {
@@ -72,7 +96,6 @@ const usuariosController = {
 
     Usuario.validarUsuarioLogin(correo, contrasena, (err, usuarios) => {
       if (err) {
-        console.error("Error al obtener usuario:", err);
         res.status(500).json({ mensaje: "Error al obtener usuario" });
       } else {
         res.json(usuarios);
