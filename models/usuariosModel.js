@@ -1,5 +1,6 @@
 const db = require("../db");
-
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 class Usuario {
   constructor(nombre, apellido, correo, rol_id, contrasena) {
     this.nombre = nombre;
@@ -52,22 +53,34 @@ class Usuario {
           // Si ya existe un usuario con ese correo, retorna un error
           return callback(new Error("El correo ya está registrado"));
         } else {
-          // Si no existe, inserta el nuevo usuario
-          db.query(
-            "INSERT INTO usuarios (nombre, apellido, correo, rol_id, contrasena, estado) VALUES (?, ?, ?, ?, ?, true)",
-            [
-              nuevoUsuario.nombre,
-              nuevoUsuario.apellido,
-              nuevoUsuario.correo,
-              nuevoUsuario.rol_id,
-              nuevoUsuario.contrasena,
-            ],
-            (err, resultado) => {
+          // Encripta la contraseña antes de insertarla en la base de datos
+          bcrypt.hash(
+            nuevoUsuario.contrasena,
+            saltRounds,
+            (err, hashedPassword) => {
               if (err) {
-                console.error("Error al insertar usuario:", err);
+                console.error("Error al encriptar la contraseña:", err);
                 return callback(err);
               }
-              callback(null, resultado);
+
+              // Si no existe, inserta el nuevo usuario con la contraseña encriptada
+              db.query(
+                "INSERT INTO usuarios (nombre, apellido, correo, rol_id, contrasena, estado) VALUES (?, ?, ?, ?, ?, true)",
+                [
+                  nuevoUsuario.nombre,
+                  nuevoUsuario.apellido,
+                  nuevoUsuario.correo,
+                  nuevoUsuario.rol_id,
+                  hashedPassword,
+                ],
+                (err, resultado) => {
+                  if (err) {
+                    console.error("Error al insertar usuario:", err);
+                    return callback(err);
+                  }
+                  callback(null, resultado);
+                }
+              );
             }
           );
         }
@@ -89,13 +102,13 @@ class Usuario {
     );
   }
 
-  static actualizarPassword(usuario_id, usuario, callback) {
+  static actualizarPassword = (correo, hashedPassword, callback) => {
     return db.query(
       "UPDATE usuarios SET contrasena = ? WHERE correo = ?",
-      [usuario.password, usuario.correo],
+      [hashedPassword, correo],
       callback
     );
-  }
+  };
 
   static eliminarUsuario(usuarioID, callback) {
     return db.query(
@@ -104,35 +117,69 @@ class Usuario {
       callback
     );
   }
-
   static validarUsuarioLogin(correo, contrasena, callback) {
-    return db.query(
+    db.query(
       `
-    SELECT 
-    u.usuario_id, 
-    u.nombre, 
-    u.apellido, 
-    u.correo, 
-    u.estado, 
-    u.rol_id,
-    r.rol, 
-    GROUP_CONCAT(p.permiso) as permisos
-FROM 
-    usuarios as u
-LEFT JOIN 
-    roles as r on r.rol_id = u.rol_id
-LEFT JOIN 
-    roles_permisos as rp on rp.rol_id = u.rol_id
-LEFT JOIN 
-    permisos as p on p.permiso_id = rp.permiso_id
-WHERE 
-    u.correo = ? 
-    AND u.contrasena = ?
-GROUP BY 
-    u.usuario_id, u.nombre, u.apellido, u.correo, u.estado, u.rol_id;
-    `,
-      [correo, contrasena],
-      callback
+      SELECT 
+        u.usuario_id, 
+        u.nombre, 
+        u.apellido, 
+        u.correo, 
+        u.estado, 
+        u.rol_id,
+        r.rol, 
+        u.contrasena,  
+        GROUP_CONCAT(p.permiso) as permisos
+      FROM 
+        usuarios as u
+      LEFT JOIN 
+        roles as r on r.rol_id = u.rol_id
+      LEFT JOIN 
+        roles_permisos as rp on rp.rol_id = u.rol_id
+      LEFT JOIN 
+        permisos as p on p.permiso_id = rp.permiso_id
+      WHERE 
+        u.correo = ?
+      GROUP BY 
+        u.usuario_id, u.nombre, u.apellido, u.correo, u.estado, u.rol_id;
+      `,
+      [correo],
+      (err, results) => {
+        if (err) {
+          return callback(err);
+        }
+
+        if (results.length === 0) {
+          // No se encontró el usuario
+          return callback(new Error("Correo o contraseña incorrectos"));
+        }
+
+        // Usuario encontrado, compara la contraseña encriptada
+        const usuario = results[0];
+
+        bcrypt.compare(contrasena, usuario.contrasena, (err, match) => {
+          if (err) {
+            return callback(err);
+          }
+
+          if (!match) {
+            // Contraseña incorrecta
+            return callback(new Error("Correo o contraseña incorrectos"));
+          }
+
+          // Contraseña correcta, retorna los detalles del usuario
+          callback(null, {
+            usuario_id: usuario.usuario_id,
+            nombre: usuario.nombre,
+            apellido: usuario.apellido,
+            correo: usuario.correo,
+            estado: usuario.estado,
+            rol_id: usuario.rol_id,
+            rol: usuario.rol,
+            permisos: usuario.permisos,
+          });
+        });
+      }
     );
   }
 

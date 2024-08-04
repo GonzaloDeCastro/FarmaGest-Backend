@@ -1,4 +1,5 @@
 const Usuario = require("../models/usuariosModel");
+const bcrypt = require("bcrypt");
 
 const usuariosController = {
   obtenerUsuarios: (req, res) => {
@@ -55,17 +56,28 @@ const usuariosController = {
     });
   },
 
-  actualizarPassword: (req, res) => {
-    const nuevoPassword = req.body;
+  actualizarPassword: async (req, res) => {
+    const { password } = req.body;
+    const correo = req.params.correo;
 
-    Usuario.actualizarPassword(
-      req.params.correo,
-      nuevoPassword,
-      (err, usuario) => {
-        if (err) throw err;
-        res.json(usuario);
-      }
-    );
+    // Encriptar la nueva contraseña
+    try {
+      const saltRounds = 10; // Puedes ajustar el número de rondas según tus necesidades
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      Usuario.actualizarPassword(correo, hashedPassword, (err, usuario) => {
+        if (err) {
+          console.error("Error al actualizar la contraseña:", err);
+          return res
+            .status(500)
+            .json({ mensaje: "Error al actualizar la contraseña" });
+        }
+        res.json({ mensaje: "Contraseña actualizada correctamente" });
+      });
+    } catch (error) {
+      console.error("Error al encriptar la contraseña:", error);
+      res.status(500).json({ mensaje: "Error al encriptar la contraseña" });
+    }
   },
   eliminarUsuario: (req, res) => {
     const usuarioID = req.params.id; // Obtener el ID del usuario desde los parámetros de la URL
@@ -96,7 +108,7 @@ const usuariosController = {
 
     Usuario.validarUsuarioLogin(correo, contrasena, (err, usuarios) => {
       if (err) {
-        res.status(500).json({ mensaje: "Error al obtener usuario" });
+        res.status(401).json("Error: Correo o contraseña incorrectos");
       } else {
         res.json(usuarios);
       }
