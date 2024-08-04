@@ -17,8 +17,14 @@ const clientesController = {
   },
 
   agregarCliente: (req, res) => {
-    const { nombre, apellido, dni, obrasocial, ciudad } = req.body;
-    const nuevoCliente = new Cliente(nombre, apellido, dni, obrasocial, ciudad);
+    const { nombre, apellido, dni, obra_social_id, ciudad_id } = req.body;
+    const nuevoCliente = new Cliente(
+      nombre,
+      apellido,
+      dni,
+      obra_social_id,
+      ciudad_id
+    );
 
     Cliente.agregarCliente(nuevoCliente, (err, resultado) => {
       if (err) {

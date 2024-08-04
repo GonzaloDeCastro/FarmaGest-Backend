@@ -1,12 +1,12 @@
 const db = require("../db");
 
 class Cliente {
-  constructor(nombre, apellido, dni, obrasocial, ciudad) {
+  constructor(nombre, apellido, dni, obra_social_id, ciudad_id) {
     this.nombre = nombre;
     this.apellido = apellido;
     this.dni = dni;
-    this.obrasocial = obrasocial;
-    this.ciudad = ciudad;
+    this.obra_social_id = obra_social_id;
+    this.ciudad_id = ciudad_id;
   }
 
   static obtenerClientes(page = 0, pageSize = 6, search = "", callback) {
