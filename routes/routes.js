@@ -5,7 +5,9 @@ const productosRoutes = require("./productosRoute.js");
 const usuariosRoutes = require("./usuariosRoute.js");
 const clientesRoutes = require("./clientesRoute.js");
 const obrasSocialesRoutes = require("./obrasSocialesRoute.js");
+const ventasRoutes = require("./ventasRoute.js");
 
+router.use("/ventas/", ventasRoutes());
 router.use("/proveedores/", proveedoresRoutes());
 router.use("/productos/", productosRoutes());
 router.use("/usuarios/", usuariosRoutes());
