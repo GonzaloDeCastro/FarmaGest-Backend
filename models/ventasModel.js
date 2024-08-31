@@ -113,8 +113,19 @@ class Venta {
       });
     });
   }
+  static obtenerUltimaVenta(callback) {
+    console.log("Iniciando consulta para obtener el último ID de venta");
+    const queryVenta = `SELECT venta_id FROM ventas ORDER BY venta_id DESC LIMIT 1`;
 
-  // Otros métodos permanecen iguales...
+    db.query(queryVenta, (err, resultados) => {
+      if (err) return callback(err);
+      if (resultados.length === 0) return callback(null, null); // No hay ventas registradas.
+
+      // Asegurarte de que estás accediendo correctamente a venta_id de resultados
+      const ventaId = resultados[0].venta_id;
+      callback(null, ventaId); // Devuelve el ID directamente.
+    });
+  }
 }
 
 module.exports = Venta;

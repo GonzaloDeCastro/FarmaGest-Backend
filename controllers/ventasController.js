@@ -34,8 +34,6 @@ const ventasController = {
   },
 
   obtenerVentaPorId: (req, res) => {
-    const venta_id = req.params.id;
-
     Venta.obtenerVentaConItemsPorId(venta_id, (err, venta) => {
       if (err) {
         console.error("Error al obtener la venta:", err);
@@ -50,7 +48,22 @@ const ventasController = {
     });
   },
 
-  // Otros métodos permanecen iguales...
+  obtenerUltimaVenta: (req, res) => {
+    console.log("Consulta para obtener la última venta iniciada.");
+    Venta.obtenerUltimaVenta((err, ventaId) => {
+      if (err) {
+        console.error("Error al obtener la última venta:", err);
+        return res
+          .status(500)
+          .json({ mensaje: "Error al obtener la última venta" });
+      }
+
+      if (ventaId === null) {
+        return res.status(404).json({ mensaje: "Venta no encontrada" });
+      }
+      res.json({ venta_id: ventaId }); // Devolver un objeto para consistencia
+    });
+  },
 };
 
 module.exports = ventasController;

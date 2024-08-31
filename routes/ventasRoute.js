@@ -7,9 +7,10 @@ module.exports = () => {
   router.post("/", ventasController.crearVenta);
 
   // Obtener una venta específica con ítems por ID
-  router.get("/:id", ventasController.obtenerVentaPorId);
+  router.get("/venta-id/:id", ventasController.obtenerVentaPorId);
   // Obtener todas las ventas
   router.get("/", ventasController.obtenerTodasLasVentas);
+  router.get("/ultima-venta", ventasController.obtenerUltimaVenta);
 
   // Otros métodos permanecen iguales...
 
