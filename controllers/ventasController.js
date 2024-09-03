@@ -1,21 +1,6 @@
 const Venta = require("../models/ventasModel");
 
 const ventasController = {
-  crearVenta: (req, res) => {
-    const { cliente_id, usuario_id, fecha, total, items } = req.body;
-    const nuevaVenta = new Venta(cliente_id, usuario_id, fecha, total, items);
-
-    Venta.crearVentaConItems(nuevaVenta, (err, ventaId) => {
-      if (err) {
-        console.error("Error al crear la venta:", err);
-        res.status(500).json({ mensaje: "Error al crear la venta" });
-      } else {
-        res
-          .status(201)
-          .json({ mensaje: "Venta creada exitosamente", venta_id: ventaId });
-      }
-    });
-  },
   obtenerTodasLasVentas: (req, res) => {
     // Extraemos los parámetros de paginación y búsqueda del objeto req.query
     const page = parseInt(req.query.page) || 1;
@@ -49,7 +34,6 @@ const ventasController = {
   },
 
   obtenerUltimaVenta: (req, res) => {
-    console.log("Consulta para obtener la última venta iniciada.");
     Venta.obtenerUltimaVenta((err, ventaId) => {
       if (err) {
         console.error("Error al obtener la última venta:", err);
@@ -57,11 +41,27 @@ const ventasController = {
           .status(500)
           .json({ mensaje: "Error al obtener la última venta" });
       }
-
       if (ventaId === null) {
         return res.status(404).json({ mensaje: "Venta no encontrada" });
       }
       res.json({ venta_id: ventaId }); // Devolver un objeto para consistencia
+    });
+  },
+
+  crearVenta: (req, res) => {
+    const { cliente_id, usuario_id, total, itemsAgregados, numero_factura } =
+      req.body;
+    const nuevaVenta = { cliente_id, usuario_id, total, numero_factura };
+
+    Venta.agregarVenta(nuevaVenta, itemsAgregados, (err, ventaId) => {
+      if (err) {
+        console.error("Error al crear la venta:", err);
+        res.status(500).json({ mensaje: "Error al crear la venta" });
+      } else {
+        res
+          .status(201)
+          .json({ mensaje: "Venta creada exitosamente", venta_id: ventaId });
+      }
     });
   },
 };

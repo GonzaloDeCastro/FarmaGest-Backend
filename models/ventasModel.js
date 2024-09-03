@@ -2,42 +2,14 @@ const db = require("../db");
 const ItemVenta = require("./itemsVentaModel");
 
 class Venta {
-  constructor(cliente_id, usuario_id, fecha, total, items) {
+  constructor(cliente_id, usuario_id, fecha_hora, total, itemsAgregados) {
     this.cliente_id = cliente_id;
     this.usuario_id = usuario_id;
-    this.fecha = fecha;
+    this.fecha_hora = fecha_hora;
     this.total = total;
-    this.items = items; // Array de items asociados a la venta
+    this.itemsAgregados = itemsAgregados; // Array de items asociados a la venta
   }
 
-  static crearVentaConItems(nuevaVenta, callback) {
-    const queryVenta = `
-      INSERT INTO ventas (cliente_id, usuario_id, fecha, total, numero_factura)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const paramsVenta = [
-      nuevaVenta.cliente_id,
-      nuevaVenta.usuario_id,
-      nuevaVenta.fecha,
-      nuevaVenta.total,
-      nuevaVenta.numero_factura,
-    ];
-
-    db.query(queryVenta, paramsVenta, (err, resultado) => {
-      if (err) return callback(err);
-
-      const ventaId = resultado.insertId;
-      const items = nuevaVenta.items.map((item) => ({
-        ...item,
-        venta_id: ventaId,
-      }));
-
-      ItemVenta.agregarItems(items, (err) => {
-        if (err) return callback(err);
-        callback(null, ventaId);
-      });
-    });
-  }
   static obtenerTodasLasVentas(
     { page = 1, pageSize = 10, search = "" },
     callback
@@ -75,14 +47,14 @@ class Venta {
         WHERE iv.venta_id IN (?)
       `;
 
-        db.query(queryItems, [ventaIds], (err, items) => {
+        db.query(queryItems, [ventaIds], (err, itemsAgregados) => {
           if (err) return callback(err);
 
           const ventasConItems = ventas.map((venta) => {
-            const itemsDeVenta = items.filter(
+            const itemsDeVenta = itemsAgregados.filter(
               (item) => item.venta_id === venta.venta_id
             );
-            return { ...venta, items: itemsDeVenta };
+            return { ...venta, itemsAgregados: itemsDeVenta };
           });
 
           callback(null, ventasConItems);
@@ -114,7 +86,6 @@ class Venta {
     });
   }
   static obtenerUltimaVenta(callback) {
-    console.log("Iniciando consulta para obtener el último ID de venta");
     const queryVenta = `SELECT venta_id FROM ventas ORDER BY venta_id DESC LIMIT 1`;
 
     db.query(queryVenta, (err, resultados) => {
@@ -125,6 +96,45 @@ class Venta {
       const ventaId = resultados[0].venta_id;
       callback(null, ventaId); // Devuelve el ID directamente.
     });
+  }
+
+  static agregarVenta(nuevaVenta, itemsAgregados, callback) {
+    // Primero, insertamos la venta
+    const numeroFactura = nuevaVenta.numero_factura.toString().padStart(9, "0");
+    db.query(
+      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, numero_factura) VALUES (?, ?, NOW(), ?, ?)",
+      [
+        nuevaVenta.cliente_id,
+        nuevaVenta.usuario_id,
+        nuevaVenta.total,
+        numeroFactura,
+      ],
+      (error, resultadoVenta) => {
+        if (error) {
+          console.error("Error al insertar venta:", error);
+          return callback(error);
+        }
+
+        // Si la venta se inserta correctamente, procedemos con los items
+        const ventaId = resultadoVenta.insertId;
+        // Preparamos las queries para insertar cada item
+        itemsAgregados.forEach((item) => {
+          db.query(
+            "INSERT INTO items_venta (venta_id, producto_id, cantidad, precio_unitario, total_item) VALUES (?, ?, ?, ?, ?)",
+            [ventaId, item.productoId, item.cantidad, item.precio, item.total],
+            (err) => {
+              if (err) {
+                console.error("Error al insertar item de venta:", err);
+                return callback(err); // En caso de error, devolver el error
+              }
+            }
+          );
+        });
+
+        // Si todo es correcto, devolvemos el ID de la venta
+        callback(null, ventaId);
+      }
+    );
   }
 }
 
