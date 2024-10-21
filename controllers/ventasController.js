@@ -19,6 +19,7 @@ const ventasController = {
   },
 
   obtenerVentaPorId: (req, res) => {
+    const venta_id = req.params.id;
     Venta.obtenerVentaConItemsPorId(venta_id, (err, venta) => {
       if (err) {
         console.error("Error al obtener la venta:", err);

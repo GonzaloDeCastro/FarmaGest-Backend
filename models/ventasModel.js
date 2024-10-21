@@ -65,7 +65,11 @@ class Venta {
 
   static obtenerVentaConItemsPorId(venta_id, callback) {
     const queryVenta = `
-      SELECT v.venta_id, v.fecha_hora, v.total, c.nombre AS cliente_nombre, u.nombre AS usuario_nombre
+      SELECT v.venta_id, v.fecha_hora, v.total, 
+      c.nombre AS cliente_nombre,
+      c.apellido AS cliente_apellido, 
+      u.nombre AS usuario_nombre,
+      u.apellido AS usuario_apellido
       FROM ventas v
       JOIN clientes c ON v.cliente_id = c.cliente_id
       JOIN usuarios u ON v.usuario_id = u.usuario_id
