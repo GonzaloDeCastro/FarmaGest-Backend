@@ -106,10 +106,11 @@ class Venta {
     // Primero, insertamos la venta
     const numeroFactura = nuevaVenta.numero_factura.toString().padStart(9, "0");
     db.query(
-      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, numero_factura) VALUES (?, ?, NOW(), ?, ?)",
+      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, numero_factura) VALUES (?, ?, ?, ?, ?)",
       [
         nuevaVenta.cliente_id,
         nuevaVenta.usuario_id,
+        nuevaVenta.fecha_hora,
         nuevaVenta.total,
         numeroFactura,
       ],

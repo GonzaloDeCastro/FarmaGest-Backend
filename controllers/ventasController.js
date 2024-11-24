@@ -50,9 +50,21 @@ const ventasController = {
   },
 
   crearVenta: (req, res) => {
-    const { cliente_id, usuario_id, total, itemsAgregados, numero_factura } =
-      req.body;
-    const nuevaVenta = { cliente_id, usuario_id, total, numero_factura };
+    const {
+      cliente_id,
+      usuario_id,
+      total,
+      itemsAgregados,
+      numero_factura,
+      fecha_hora,
+    } = req.body;
+    const nuevaVenta = {
+      cliente_id,
+      usuario_id,
+      total,
+      numero_factura,
+      fecha_hora,
+    };
 
     Venta.agregarVenta(nuevaVenta, itemsAgregados, (err, ventaId) => {
       if (err) {

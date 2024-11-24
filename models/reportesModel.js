@@ -53,8 +53,6 @@ class Reporte {
       `;
     }
 
-    console.log(queryVentasPorFecha, params);
-
     db.query(queryVentasPorFecha, params, (err, resultados) => {
       if (err) return callback(err);
 
