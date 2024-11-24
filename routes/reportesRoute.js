@@ -4,7 +4,7 @@ const reportesController = require("../controllers/reportesController");
 
 module.exports = () => {
   // Obtener todas las ventas
-  router.get("/", reportesController.obtenerTodasLasVentas);
+  router.get("/", reportesController.obtenerVentasPorFecha);
 
   return router;
 };
