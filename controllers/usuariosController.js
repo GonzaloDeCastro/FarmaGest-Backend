@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const usuariosController = {
   obtenerUsuarios: (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
+    const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
     const rolID = req.query.rolID || 0;
 

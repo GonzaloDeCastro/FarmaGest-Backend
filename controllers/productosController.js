@@ -3,7 +3,7 @@ const Producto = require("../models/productosModel");
 const productosController = {
   obtenerProductos: (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
+    const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
 
     Producto.obtenerProductos(page, pageSize, search, (err, productos) => {

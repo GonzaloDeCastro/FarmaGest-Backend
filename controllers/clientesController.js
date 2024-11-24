@@ -3,7 +3,7 @@ const Cliente = require("../models/clientesModel");
 const clientesController = {
   obtenerClientes: (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
+    const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
 
     Cliente.obtenerClientes(page, pageSize, search, (err, clientes) => {
