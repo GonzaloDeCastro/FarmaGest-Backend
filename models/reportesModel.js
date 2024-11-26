@@ -35,7 +35,7 @@ class Reporte {
     if (dateSelectedTo) {
       // Si `dateSelectedTo` está definido
       queryVentasPorFecha = `
-        SELECT DATE(v.fecha_hora) AS fecha, SUM(v.total) AS monto_total
+        SELECT DATE(v.fecha_hora) AS fecha, COUNT(*) AS cantidad_ventas,SUM(v.total) AS monto_total
         FROM ventas v
         WHERE DATE(v.fecha_hora) BETWEEN DATE(?) AND DATE(?)
         GROUP BY DATE(v.fecha_hora)
@@ -45,7 +45,7 @@ class Reporte {
     } else {
       // Si `dateSelectedTo` es nulo, buscar desde `dateSelectedFrom` hasta hoy
       queryVentasPorFecha = `
-        SELECT DATE(v.fecha_hora) AS fecha, SUM(v.total) AS monto_total
+        SELECT DATE(v.fecha_hora) AS fecha, COUNT(*) AS cantidad_ventas,SUM(v.total) AS monto_total
         FROM ventas v
         WHERE DATE(v.fecha_hora) >= DATE(?)
         GROUP BY DATE(v.fecha_hora)
