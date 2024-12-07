@@ -1,31 +1,36 @@
-const Reporte = require("../models/reportesModel");
+// reportesController.js
+const { VentasPorFechaStrategy } = require("../models/reportesStrategies");
 
-const reportesController = {
-  obtenerVentasPorFecha: (req, res) => {
-    // Extraemos los parámetros de paginación y búsqueda del objeto req.query
-    const dateSelectedFrom = req.query.dateSelectedFrom || "2024-09-01";
-    const dateSelectedTo = req.query.dateSelectedTo || null;
-    const entitySelected = req.query.entitySelected || "";
-    const clienteProductoVendedor = req.query.clienteProductoVendedor || "";
+// Clase Contexto que gestiona la estrategia a utilizar.
+class ReporteContext {
+  constructor(strategy) {
+    this.strategy = strategy; // Almacena la estrategia pasada al constructor.
+  }
 
-    // Llamamos a obtenerTodasLasVentas pasando un objeto con los parámetros y un callback
-    Reporte.obtenerVentasPorFecha(
-      {
-        dateSelectedFrom,
-        dateSelectedTo,
-        entitySelected,
-        clienteProductoVendedor,
-      },
-      (err, ventas) => {
-        if (err) {
-          console.error("Error al obtener las ventas:", err);
-          res.status(500).json({ mensaje: "Error al obtener las ventas" });
-        } else {
-          res.json(ventas);
-        }
+  setStrategy(strategy) {
+    this.strategy = strategy; // Permite cambiar la estrategia en tiempo de ejecución.
+  }
+
+  // Método que utiliza la estrategia configurada para procesar la solicitud y enviar la respuesta.
+  obtenerReporte(req, res) {
+    this.strategy.execute(req, (err, result) => {
+      if (err) {
+        console.error("Error al obtener el reporte:", err);
+        res.status(500).json({ mensaje: "Error al obtener el reporte" });
+      } else {
+        res.json(result);
       }
-    );
+    });
+  }
+}
+
+// Controlador que utiliza el contexto y la estrategia para manejar las solicitudes de reportes de ventas.
+const reporteController = {
+  obtenerVentasPorFecha: (req, res) => {
+    const context = new ReporteContext(new VentasPorFechaStrategy());
+    context.obtenerReporte(req, res);
   },
 };
 
-module.exports = reportesController;
+// Exporta el controlador para que pueda ser utilizado por las rutas.
+module.exports = reporteController;
