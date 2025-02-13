@@ -1,4 +1,4 @@
-const db = require("../db");
+/* const db = require("../db");
 
 class Reporte {
   constructor({
@@ -62,3 +62,4 @@ class Reporte {
 }
 
 module.exports = Reporte;
+ */

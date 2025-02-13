@@ -117,7 +117,13 @@ class Usuario {
       callback
     );
   }
-  static validarUsuarioLogin(correo, contrasena, callback) {
+  static validarUsuarioLogin(
+    correo,
+    contrasena,
+    ip_address,
+    user_agent,
+    callback
+  ) {
     db.query(
       `
       SELECT 
@@ -166,6 +172,18 @@ class Usuario {
             // Contraseña incorrecta
             return callback(new Error("Correo o contraseña incorrectos"));
           }
+
+          db.query(
+            `INSERT INTO sesiones (correo_usuario, navegador, ip, hora_logueo, ultima_actividad)
+             VALUES (?, ?, ?, NOW(), NOW())`,
+            [correo, user_agent, ip_address],
+            (err, resultado) => {
+              if (err) {
+                console.error("Error al insertar usuario:", err);
+                return callback(err);
+              }
+            }
+          );
 
           // Contraseña correcta, retorna los detalles del usuario
           callback(null, {

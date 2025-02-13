@@ -105,14 +105,22 @@ const usuariosController = {
   validarUsuarioLogin: (req, res) => {
     const correo = req.query.correo;
     const contrasena = req.query.contrasena;
+    const ip_address = req.query.ip_address;
+    const user_agent = req.query.user_agent;
 
-    Usuario.validarUsuarioLogin(correo, contrasena, (err, usuarios) => {
-      if (err) {
-        res.status(401).json("Error: Correo o contraseña incorrectos");
-      } else {
-        res.json(usuarios);
+    Usuario.validarUsuarioLogin(
+      correo,
+      contrasena,
+      ip_address,
+      user_agent,
+      (err, usuarios) => {
+        if (err) {
+          res.status(401).json("Error: Correo o contraseña incorrectos");
+        } else {
+          res.json(usuarios);
+        }
       }
-    });
+    );
   },
 };
 
