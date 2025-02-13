@@ -1,6 +1,8 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const { v4: uuidv4 } = require("uuid"); // Importar la función para generar UUID
+
 class Usuario {
   constructor(nombre, apellido, correo, rol_id, contrasena) {
     this.nombre = nombre;
@@ -172,11 +174,11 @@ class Usuario {
             // Contraseña incorrecta
             return callback(new Error("Correo o contraseña incorrectos"));
           }
-
+          const sessionId = uuidv4(); // Generar un UUID único para la sesión
           db.query(
-            `INSERT INTO sesiones (correo_usuario, navegador, ip, hora_logueo, ultima_actividad)
-             VALUES (?, ?, ?, NOW(), NOW())`,
-            [correo, user_agent, ip_address],
+            `INSERT INTO sesiones (sesion_id, correo_usuario, navegador, ip, hora_logueo, ultima_actividad)
+             VALUES (?, ?, ?, ?, NOW(), NOW())`,
+            [sessionId, correo, user_agent, ip_address],
             (err, resultado) => {
               if (err) {
                 console.error("Error al insertar usuario:", err);
@@ -195,6 +197,7 @@ class Usuario {
             rol_id: usuario.rol_id,
             rol: usuario.rol,
             permisos: usuario.permisos,
+            sesion_id: sessionId,
           });
         });
       }
