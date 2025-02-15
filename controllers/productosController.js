@@ -61,19 +61,25 @@ const productosController = {
   eliminarProducto: (req, res) => {
     const productoID = req.params.id;
     const usuario_id = req.body.usuario_id;
+    const productoNombre = req.body.Nombre;
 
-    Producto.eliminarProducto(productoID, usuario_id, (err, resultado) => {
-      if (err) {
-        console.error("Error al eliminar producto:", err);
-        res.status(500).json({ mensaje: "Error al eliminar producto" });
-      } else {
-        if (resultado.affectedRows > 0) {
-          res.json({ mensaje: "Producto eliminado correctamente" });
+    Producto.eliminarProducto(
+      productoID,
+      usuario_id,
+      productoNombre,
+      (err, resultado) => {
+        if (err) {
+          console.error("Error al eliminar producto:", err);
+          res.status(500).json({ mensaje: "Error al eliminar producto" });
         } else {
-          res.status(404).json({ mensaje: "Producto no encontrado" });
+          if (resultado.affectedRows > 0) {
+            res.json({ mensaje: "Producto eliminado correctamente" });
+          } else {
+            res.status(404).json({ mensaje: "Producto no encontrado" });
+          }
         }
       }
-    });
+    );
   },
 
   obtenerCategorias: (req, res) => {
