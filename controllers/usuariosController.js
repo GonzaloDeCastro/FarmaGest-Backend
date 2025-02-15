@@ -79,6 +79,7 @@ const usuariosController = {
       res.status(500).json({ mensaje: "Error al encriptar la contraseña" });
     }
   },
+
   eliminarUsuario: (req, res) => {
     const usuarioID = req.params.id; // Obtener el ID del usuario desde los parámetros de la URL
 
@@ -88,6 +89,24 @@ const usuariosController = {
       } else {
         if (resultado.affectedRows > 0) {
           res.json({ mensaje: "Usuario eliminado correctamente" });
+        } else {
+          res.status(404).json({ mensaje: "Usuario no encontrado" });
+        }
+      }
+    });
+  },
+
+  logoutUsuario: (req, res) => {
+    const sessionId = req.params.sesion_id; // Obtener el ID del usuario desde los parámetros de la URL
+
+    Usuario.logoutUsuario(sessionId, (err, resultado) => {
+      if (err) {
+        res.status(500).json({ mensaje: "Error al desloguear usuario" });
+      } else {
+        if (resultado.affectedRows > 0) {
+          res
+            .status(200)
+            .json({ mensaje: "Usuario deslogueado correctamente" });
         } else {
           res.status(404).json({ mensaje: "Usuario no encontrado" });
         }

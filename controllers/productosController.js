@@ -17,7 +17,9 @@ const productosController = {
   },
 
   agregarProducto: (req, res) => {
-    const { nombre, codigo, marca, categoria_id, stock, precio } = req.body;
+    const { nombre, codigo, marca, categoria_id, stock, precio, usuario_id } =
+      req.body;
+
     const nuevoProducto = new Producto(
       nombre,
       codigo,
@@ -27,14 +29,14 @@ const productosController = {
       precio
     );
 
-    Producto.agregarProducto(nuevoProducto, (err, resultado) => {
+    Producto.agregarProducto(nuevoProducto, usuario_id, (err, resultado) => {
       if (err) {
         console.error("Error al agregar producto:", err);
         res.status(500).json({ mensaje: "Error al agregar producto" });
       } else {
         res.status(201).json({
           mensaje: "Producto agregado correctamente",
-          producto_id: resultado.insertId,
+          producto_id: resultado.id,
         });
       }
     });
@@ -58,8 +60,9 @@ const productosController = {
 
   eliminarProducto: (req, res) => {
     const productoID = req.params.id;
+    const usuario_id = req.body.usuario_id;
 
-    Producto.eliminarProducto(productoID, (err, resultado) => {
+    Producto.eliminarProducto(productoID, usuario_id, (err, resultado) => {
       if (err) {
         console.error("Error al eliminar producto:", err);
         res.status(500).json({ mensaje: "Error al eliminar producto" });

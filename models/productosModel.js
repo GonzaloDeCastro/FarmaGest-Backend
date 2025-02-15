@@ -29,8 +29,8 @@ class Producto {
     return db.query(query, params, callback);
   }
 
-  static agregarProducto(nuevoProducto, callback) {
-    return db.query(
+  static agregarProducto(nuevoProducto, usuario_id, callback) {
+    db.query(
       "INSERT INTO productos (nombre, codigo, marca, categoria_id, stock, precio) VALUES (?, ?, ?, ?, ?,?)",
       [
         nuevoProducto.nombre,
@@ -40,27 +40,102 @@ class Producto {
         nuevoProducto.stock,
         nuevoProducto.precio,
       ],
-      callback
+      (err, result) => {
+        if (err) {
+          return callback(err, null);
+        }
+        db.query(
+          "INSERT INTO auditoria_productos (producto_id, accion, detalle_cambio, fecha_movimiento, usuario_id) VALUES (?, 'CREAR', '-', NOW(), ?)",
+          [result.insertId, usuario_id], // usuario_id por defecto 1 si no está disponible
+          (err) => {
+            if (err) {
+              console.error("Error al registrar en auditoría:", err);
+            }
+          }
+        );
+        callback(null, { id: result.insertId, ...nuevoProducto });
+      }
     );
   }
 
   static actualizarProducto(producto_id, producto, callback) {
-    return db.query(
-      "UPDATE productos SET nombre = ?, codigo = ?, marca = ?, categoria_id = ?, stock = ? ,precio = ? WHERE producto_id = ?",
-      [
-        producto.nombre,
-        producto.codigo,
-        producto.marca,
-        producto.categoria_id,
-        producto.stock,
-        producto.precio,
-        parseInt(producto_id),
-      ],
-      callback
+    // 1️⃣ Obtener el producto actual antes de la actualización
+    db.query(
+      "SELECT * FROM productos WHERE producto_id = ?",
+      [producto_id],
+      (err, resultados) => {
+        if (err) {
+          return callback(err, null);
+        }
+
+        if (resultados.length === 0) {
+          return callback(new Error("Producto no encontrado"), null);
+        }
+
+        const productoActual = resultados[0];
+        let detalle_cambio = "";
+
+        // 2️⃣ Comparar campo por campo y generar la descripción del cambio
+        if (producto.nombre !== productoActual.nombre) {
+          detalle_cambio += `Nombre: ${productoActual.nombre} → ${producto.nombre}; `;
+        }
+        if (producto.codigo !== productoActual.codigo) {
+          detalle_cambio += `Código: ${productoActual.codigo} → ${producto.codigo}; `;
+        }
+        if (producto.marca !== productoActual.marca) {
+          detalle_cambio += `Marca: ${productoActual.marca} → ${producto.marca}; `;
+        }
+        if (producto.categoria_id !== productoActual.categoria_id) {
+          detalle_cambio += `Categoría: ${productoActual.categoria_id} → ${producto.categoria_id}; `;
+        }
+        if (producto.stock !== productoActual.stock) {
+          detalle_cambio += `Stock: ${productoActual.stock} → ${producto.stock}; `;
+        }
+        if (producto.precio !== productoActual.precio) {
+          detalle_cambio += `Precio: ${productoActual.precio} → ${producto.precio}; `;
+        }
+
+        // 4️⃣ Ejecutar la actualización en la base de datos
+        db.query(
+          "UPDATE productos SET nombre = ?, codigo = ?, marca = ?, categoria_id = ?, stock = ?, precio = ? WHERE producto_id = ?",
+          [
+            producto.nombre,
+            producto.codigo,
+            producto.marca,
+            producto.categoria_id,
+            producto.stock,
+            producto.precio,
+            parseInt(producto_id),
+          ],
+          callback
+        );
+
+        if (detalle_cambio !== "") {
+          db.query(
+            "INSERT INTO auditoria_productos (producto_id, accion, detalle_cambio, fecha_movimiento, usuario_id) VALUES (?, 'ACTUALIZAR', ?, NOW(), ?)",
+            [producto_id, detalle_cambio, producto.usuario_id], // usuario_id por defecto 1 si no está disponible
+            (err) => {
+              if (err) {
+                console.error("Error al registrar en auditoría:", err);
+              }
+            }
+          );
+        }
+      }
     );
   }
 
-  static eliminarProducto(producto_id, callback) {
+  static eliminarProducto(producto_id, usuario_id, callback) {
+    db.query(
+      "INSERT INTO auditoria_productos (producto_id, accion, fecha_movimiento,detalle_cambio, usuario_id) VALUES (?, 'ELIMINAR', NOW(),'-',?)",
+      [producto_id, usuario_id],
+      (err) => {
+        if (err) {
+          console.error("Error al registrar en auditoría:", err);
+        }
+      }
+    );
+
     return db.query(
       "DELETE FROM productos WHERE producto_id = ?",
       [producto_id],

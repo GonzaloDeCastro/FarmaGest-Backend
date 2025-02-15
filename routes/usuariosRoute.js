@@ -16,6 +16,7 @@ module.exports = () => {
   // Actualizar un usuario existente
   router.put("/:id", usuariosController.actualizarUsuario);
   router.put("/pwd/:correo", usuariosController.actualizarPassword);
+  router.put("/logout/:sesion_id", usuariosController.logoutUsuario);
 
   // Eliminar un usuario existente
   router.delete("/:id", usuariosController.eliminarUsuario);

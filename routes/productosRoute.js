@@ -18,7 +18,7 @@ module.exports = () => {
   router.put("/:id", productosController.actualizarProducto);
 
   // Eliminar un producto existente
-  router.delete("/:id", productosController.eliminarProducto);
+  router.put("/delete/:id", productosController.eliminarProducto);
 
   return router;
 };

@@ -119,6 +119,21 @@ class Usuario {
       callback
     );
   }
+  static logoutUsuario(sessionId, callback) {
+    return db.query(
+      `UPDATE sesiones SET hora_logout = NOW() WHERE sesion_id = ?`,
+      [sessionId],
+      (err, resultado) => {
+        if (err) {
+          console.error("Error al desloguear usuario:", err);
+          return callback(err);
+        } else {
+          return callback(null, resultado);
+        }
+      }
+    );
+  }
+
   static validarUsuarioLogin(
     correo,
     contrasena,
