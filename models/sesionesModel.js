@@ -25,11 +25,12 @@ class Sesiones {
     let query = `
     SELECT correo_usuario, navegador, ip, hora_logueo, ultima_actividad, hora_logout, sesion_id
     FROM sesiones
+     WHERE (correo_usuario LIKE ? OR navegador LIKE ?)
     ORDER BY hora_logueo DESC`;
-    /* const params = [searchQuery, searchQuery, searchQuery];
-    query += ` LIMIT ? OFFSET ?`; */
-    /* params.push(pageSize, offset); */
-    return db.query(query, /*  params, */ callback);
+    const params = [searchQuery, searchQuery];
+    query += ` LIMIT ? OFFSET ?`;
+    params.push(pageSize, offset);
+    return db.query(query, params, callback);
   }
 }
 

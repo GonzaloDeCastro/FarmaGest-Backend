@@ -45,7 +45,7 @@ class Producto {
           return callback(err, null);
         }
         db.query(
-          `INSERT INTO auditoria_productos (producto_id, accion, detalle_cambio, fecha_movimiento, usuario_id) VALUES (?, 'CREAR', 'Se ha creado un nuevo producto ${nuevoProducto.nombre}', NOW(), ?)`,
+          `INSERT INTO auditoria_productos (producto_id, accion, detalle_cambio, fecha_movimiento, usuario_id) VALUES (?, 'CREAR', 'Se ha creado un nuevo producto ${nuevoProducto.nombre} → Código ${nuevoProducto.codigo}', NOW(), ?)`,
           [result.insertId, usuario_id], // usuario_id por defecto 1 si no está disponible
           (err) => {
             if (err) {
@@ -125,9 +125,15 @@ class Producto {
     );
   }
 
-  static eliminarProducto(producto_id, usuario_id, productoNombre, callback) {
+  static eliminarProducto(
+    producto_id,
+    usuario_id,
+    productoNombre,
+    productoCodigo,
+    callback
+  ) {
     db.query(
-      `INSERT INTO auditoria_productos (producto_id, accion, fecha_movimiento,detalle_cambio, usuario_id) VALUES (?, 'ELIMINAR', NOW(),'Se ha eliminado este producto ${productoNombre}',?)`,
+      `INSERT INTO auditoria_productos (producto_id, accion, fecha_movimiento,detalle_cambio, usuario_id) VALUES (?, 'ELIMINAR', NOW(),'Se ha eliminado este producto ${productoNombre} → Código ${productoCodigo}',?)`,
       [producto_id, usuario_id],
       (err) => {
         if (err) {

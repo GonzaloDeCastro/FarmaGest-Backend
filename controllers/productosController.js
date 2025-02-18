@@ -62,11 +62,13 @@ const productosController = {
     const productoID = req.params.id;
     const usuario_id = req.body.usuario_id;
     const productoNombre = req.body.Nombre;
+    const productoCodigo = req.body.CodigoFecha;
 
     Producto.eliminarProducto(
       productoID,
       usuario_id,
       productoNombre,
+      productoCodigo,
       (err, resultado) => {
         if (err) {
           console.error("Error al eliminar producto:", err);
