@@ -8,7 +8,7 @@ const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar
 
 app.use(express.json());
 const corsOptions = {
-  origin: "https://farma-gest.vercel.app", // Asegúrate de cambiar esto al dominio correcto de tu frontend
+  origin: "https://farma-gest-backend.vercel.app", // Asegúrate de cambiar esto al dominio correcto de tu frontend
 };
 
 app.use(cors(corsOptions));
