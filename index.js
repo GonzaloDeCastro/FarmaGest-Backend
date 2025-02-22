@@ -7,7 +7,11 @@ const port = 3001;
 const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar múltiples rutas
 
 app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: "https://farma-gest.vercel.app", // Asegúrate de cambiar esto al dominio correcto de tu frontend
+};
+
+app.use(cors(corsOptions));
 
 // Rutas
 app.use("/api", routes); // Monta las rutas definidas en routes.js en el endpoint '/'
