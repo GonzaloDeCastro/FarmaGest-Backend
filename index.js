@@ -8,7 +8,17 @@ const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar
 
 app.use(express.json());
 const corsOptions = {
-  origin: "https://farma-gest-backend-ezopekl21-gonzamdcs-projects.vercel.app", // Asegúrate de cambiar esto al dominio correcto de tu frontend
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "https://farma-gest.vercel.app",
+      "https://anotherdomain.com",
+    ];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
 };
 
 app.use(cors(corsOptions));
