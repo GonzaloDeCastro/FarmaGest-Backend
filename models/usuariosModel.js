@@ -191,8 +191,8 @@ class Usuario {
           }
           const sessionId = uuidv4(); // Generar un UUID único para la sesión
           db.query(
-            `INSERT INTO sesiones (sesion_id, correo_usuario, navegador, ip, hora_logueo, ultima_actividad)
-             VALUES (?, ?, ?, ?, NOW(), NOW())`,
+            `INSERT INTO sesiones (sesion_id, correo_usuario, navegador, ip, hora_logueo, ultima_actividad, hora_logout)
+             VALUES (?, ?, ?, ?, NOW(), NOW(), NULL)`,
             [sessionId, correo, user_agent, ip_address],
             (err, resultado) => {
               if (err) {
