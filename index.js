@@ -5,7 +5,6 @@ const cors = require("cors");
 const app = express();
 const port = 3001;
 const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar múltiples rutas
-
 app.use(express.json());
 app.use(cors());
 
