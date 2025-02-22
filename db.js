@@ -1,15 +1,16 @@
 // db.js
 const mysql = require("mysql2");
-
+require("dotenv").config();
 class Database {
   constructor() {
     if (!Database.instance) {
       Database.instance = this;
       this.connection = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "root",
-        database: "farma_gest",
+        host: process.env.host,
+        user: process.env.user,
+        password: process.env.password,
+        database: process.env.database,
+        timezone: "Z",
       });
 
       this.connection.connect((err) => {
