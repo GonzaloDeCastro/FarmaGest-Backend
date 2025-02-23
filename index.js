@@ -8,6 +8,11 @@ const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar
 app.use(express.json());
 app.use(cors());
 
+// Route to display a message
+app.get("/", (req, res) => {
+  res.send("Server ok!");
+});
+
 // Rutas
 app.use("/api", routes); // Monta las rutas definidas en routes.js en el endpoint '/'
 
