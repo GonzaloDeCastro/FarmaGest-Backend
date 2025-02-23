@@ -10,7 +10,7 @@ app.use(cors());
 
 // Route to display a message
 app.get("/", (req, res) => {
-  res.send("Server ok!");
+  res.send("Server ok!!");
 });
 
 // Rutas
