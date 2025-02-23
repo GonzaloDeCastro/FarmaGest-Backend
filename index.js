@@ -6,7 +6,13 @@ const app = express();
 const port = process.env.port || 3000;
 const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar múltiples rutas
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // 🔥 Cambia a tu dominio real si es necesario
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Route to display a message
 app.get("/", (req, res) => {
