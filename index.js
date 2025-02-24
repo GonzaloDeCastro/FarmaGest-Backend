@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "*", // 🔥 Cambia a tu dominio real si es necesario
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
