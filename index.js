@@ -8,7 +8,8 @@ const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin:
+      "https://farma-gest-gf40z9vuh-gonzamdcs-projects.vercel.app, http://localhost:3000",
     methods: "GET,POST,PUT,DELETE, OPTIONS",
   })
 );
