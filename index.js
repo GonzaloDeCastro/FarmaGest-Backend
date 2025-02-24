@@ -8,13 +8,14 @@ const routes = require("./routes/routes.js"); // Cambiado a plural para reflejar
 app.use(express.json());
 app.use(
   cors({
-    origin: "*", // 🔥 Cambia a tu dominio real si es necesario
+    origin: "*",
+    methods: "GET,POST,PUT,DELETE, OPTIONS",
   })
 );
 
 // Route to display a message
 app.get("/", (req, res) => {
-  res.send("Server ok!!");
+  res.send("Server ok");
 });
 
 // Rutas
