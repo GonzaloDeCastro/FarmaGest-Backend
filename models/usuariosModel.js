@@ -202,15 +202,30 @@ class Usuario {
             return callback(new Error("Correo o contraseña incorrectos"));
           }
           const sessionId = uuidv4(); // Generar un UUID único para la sesión
+          // Cerrar cualquier sesión activa antes de insertar una nueva
           db.query(
-            `INSERT INTO sesiones (sesion_id, correo_usuario, navegador, ip, hora_logueo, ultima_actividad, hora_logout)
-             VALUES (?, ?, ?, ?, NOW(), NOW(), NULL)`,
-            [sessionId, correo, user_agent, ip_address],
+            `UPDATE sesiones 
+   SET hora_logout = NOW() 
+   WHERE correo_usuario = ? AND hora_logout IS NULL`,
+            [correo],
             (err, resultado) => {
               if (err) {
-                console.error("Error al insertar usuario:", err);
+                console.error("Error al cerrar sesión anterior:", err);
                 return callback(err);
               }
+
+              // Insertar la nueva sesión
+              db.query(
+                `INSERT INTO sesiones (sesion_id, correo_usuario, navegador, ip, hora_logueo, ultima_actividad, hora_logout)
+                  VALUES (?, ?, ?, ?, NOW(), NOW(), NULL)`,
+                [sessionId, correo, user_agent, ip_address],
+                (err, resultado) => {
+                  if (err) {
+                    console.error("Error al insertar sesión:", err);
+                    return callback(err);
+                  }
+                }
+              );
             }
           );
 
