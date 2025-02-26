@@ -10,7 +10,13 @@ class Producto {
     this.precio = precio;
   }
 
-  static obtenerProductos(page = 0, pageSize = 6, search = "", callback) {
+  static obtenerProductos(
+    page = 0,
+    pageSize = 6,
+    search = "",
+    sesion,
+    callback
+  ) {
     const offset = (page - 1) * pageSize;
 
     const searchQuery = search ? `%${search}%` : "%";
@@ -21,11 +27,22 @@ class Producto {
       LEFT JOIN categorias as c on c.categoria_id = p.categoria_id
       WHERE (p.nombre LIKE ? OR p.codigo LIKE ? OR p.marca LIKE ?)
     `;
-
     const params = [searchQuery, searchQuery, searchQuery];
     query += ` LIMIT ? OFFSET ?`;
     params.push(pageSize, offset);
 
+    if (sesion) {
+      db.query(
+        `UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?`,
+        [sesion],
+        (err, resultado) => {
+          if (err) {
+            console.error("Error al insertar usuario:", err);
+            return callback(err);
+          }
+        }
+      );
+    }
     return db.query(query, params, callback);
   }
 

@@ -6,16 +6,20 @@ const ventasController = {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
+    const sesion = req.query.sesion;
 
     // Llamamos a obtenerTodasLasVentas pasando un objeto con los parámetros y un callback
-    Venta.obtenerTodasLasVentas({ page, pageSize, search }, (err, ventas) => {
-      if (err) {
-        console.error("Error al obtener las ventas:", err);
-        res.status(500).json({ mensaje: "Error al obtener las ventas" });
-      } else {
-        res.json(ventas);
+    Venta.obtenerTodasLasVentas(
+      { page, pageSize, search, sesion },
+      (err, ventas) => {
+        if (err) {
+          console.error("Error al obtener las ventas:", err);
+          res.status(500).json({ mensaje: "Error al obtener las ventas" });
+        } else {
+          res.json(ventas);
+        }
       }
-    });
+    );
   },
 
   obtenerVentaPorId: (req, res) => {

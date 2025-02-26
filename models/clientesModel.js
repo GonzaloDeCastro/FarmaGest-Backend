@@ -9,7 +9,13 @@ class Cliente {
     this.ciudad_id = ciudad_id;
   }
 
-  static obtenerClientes(page = 0, pageSize = 6, search = "", callback) {
+  static obtenerClientes(
+    page = 0,
+    pageSize = 6,
+    search = "",
+    sesion,
+    callback
+  ) {
     const offset = (page - 1) * pageSize;
     const searchQuery = search ? `%${search}%` : "%";
 
@@ -25,6 +31,18 @@ class Cliente {
     query += ` LIMIT ? OFFSET ?`;
     params.push(pageSize, offset);
 
+    if (sesion) {
+      db.query(
+        `UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?`,
+        [sesion],
+        (err, resultado) => {
+          if (err) {
+            console.error("Error al insertar usuario:", err);
+            return callback(err);
+          }
+        }
+      );
+    }
     return db.query(query, params, callback);
   }
 

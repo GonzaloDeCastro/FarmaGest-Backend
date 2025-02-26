@@ -17,6 +17,7 @@ class Usuario {
     pageSize = 6,
     search = "",
     rolID = "1",
+    sesion,
     callback
   ) {
     const offset = (page - 1) * pageSize;
@@ -37,7 +38,18 @@ class Usuario {
 
     query += ` LIMIT ? OFFSET ?`;
     params.push(pageSize, offset);
-
+    if (sesion) {
+      db.query(
+        `UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?`,
+        [sesion],
+        (err, resultado) => {
+          if (err) {
+            console.error("Error al insertar usuario:", err);
+            return callback(err);
+          }
+        }
+      );
+    }
     return db.query(query, params, callback);
   }
   static agregarUsuario(nuevoUsuario, callback) {
@@ -184,7 +196,7 @@ class Usuario {
           if (err) {
             return callback(err);
           }
-
+          console.log("match", match);
           if (!match) {
             // Contraseña incorrecta
             return callback(new Error("Correo o contraseña incorrectos"));

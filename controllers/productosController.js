@@ -5,15 +5,22 @@ const productosController = {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
+    const sesion = req.query.sesion;
 
-    Producto.obtenerProductos(page, pageSize, search, (err, productos) => {
-      if (err) {
-        console.error("Error al obtener productos:", err);
-        res.status(500).json({ mensaje: "Error al obtener productos" });
-      } else {
-        res.json(productos);
+    Producto.obtenerProductos(
+      page,
+      pageSize,
+      search,
+      sesion,
+      (err, productos) => {
+        if (err) {
+          console.error("Error al obtener productos:", err);
+          res.status(500).json({ mensaje: "Error al obtener productos" });
+        } else {
+          res.json(productos);
+        }
       }
-    });
+    );
   },
 
   agregarProducto: (req, res) => {

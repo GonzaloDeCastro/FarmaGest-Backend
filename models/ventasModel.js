@@ -11,7 +11,7 @@ class Venta {
   }
 
   static obtenerTodasLasVentas(
-    { page = 1, pageSize = 10, search = "" },
+    { page = 1, pageSize = 10, search = "", sesion },
     callback
   ) {
     const offset = (page - 1) * pageSize;
@@ -57,6 +57,18 @@ class Venta {
             return { ...venta, itemsAgregados: itemsDeVenta };
           });
 
+          if (sesion) {
+            db.query(
+              `UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?`,
+              [sesion],
+              (err, resultado) => {
+                if (err) {
+                  console.error("Error al insertar usuario:", err);
+                  return callback(err);
+                }
+              }
+            );
+          }
           callback(null, ventasConItems);
         });
       }

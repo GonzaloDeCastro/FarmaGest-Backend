@@ -5,8 +5,8 @@ const clientesController = {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
-
-    Cliente.obtenerClientes(page, pageSize, search, (err, clientes) => {
+    const sesion = req.query.sesion;
+    Cliente.obtenerClientes(page, pageSize, search, sesion, (err, clientes) => {
       if (err) {
         console.error("Error al obtener clientes:", err);
         res.status(500).json({ mensaje: "Error al obtener clientes" });

@@ -7,14 +7,22 @@ const usuariosController = {
     const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
     const rolID = req.query.rolID || 0;
+    const sesion = req.query.sesion;
 
-    Usuario.obtenerUsuarios(page, pageSize, search, rolID, (err, usuarios) => {
-      if (err) {
-        res.status(500).json({ mensaje: "Error al obtener usuarios" });
-      } else {
-        res.json(usuarios);
+    Usuario.obtenerUsuarios(
+      page,
+      pageSize,
+      search,
+      rolID,
+      sesion,
+      (err, usuarios) => {
+        if (err) {
+          res.status(500).json({ mensaje: "Error al obtener usuarios" });
+        } else {
+          res.json(usuarios);
+        }
       }
-    });
+    );
   },
 
   agregarUsuario: (req, res) => {

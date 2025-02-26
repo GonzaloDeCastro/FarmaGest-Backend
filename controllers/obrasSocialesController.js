@@ -5,11 +5,12 @@ const obrasSocialesController = {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 7;
     const search = req.query.search || "";
-
+    const sesion = req.query.sesion;
     ObraSocial.obtenerObrasSociales(
       page,
       pageSize,
       search,
+      sesion,
       (err, obrasSociales) => {
         if (err) {
           console.error("Error al obtener obras sociales:", err);
