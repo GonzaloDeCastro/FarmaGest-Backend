@@ -144,6 +144,25 @@ class Venta {
                 console.error("Error al insertar item de venta:", err);
                 return callback(err); // En caso de error, devolver el error
               }
+              db.query(
+                "UPDATE productos SET stock = stock - ? WHERE producto_id = ?",
+                [item.cantidad, item.productoId], // Evita que el stock sea negativo
+                (err, result) => {
+                  if (err) {
+                    console.error(
+                      "Error al actualizar el stock del producto:",
+                      err
+                    );
+                    return callback(err);
+                  }
+
+                  /*  if (result.affectedRows === 0) {
+                    console.warn(
+                      `Stock insuficiente para el producto ID ${item.productoId}`
+                    );
+                  } */
+                }
+              );
             }
           );
         });
