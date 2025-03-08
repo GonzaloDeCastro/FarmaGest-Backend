@@ -162,7 +162,7 @@ class Cliente {
     return db.query(
       `
       SELECT obra_social_id, obra_social, plan, descuento, codigo
-      FROM obras_sociales 
+      FROM obras_sociales WHERE deleted_at IS NULL
       `,
       callback
     );

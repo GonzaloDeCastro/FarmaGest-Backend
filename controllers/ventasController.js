@@ -57,7 +57,8 @@ const ventasController = {
     const {
       cliente_id,
       usuario_id,
-      total,
+      totalConDescuento,
+      totalSinDescuento,
       itemsAgregados,
       numero_factura,
       fecha_hora,
@@ -65,7 +66,8 @@ const ventasController = {
     const nuevaVenta = {
       cliente_id,
       usuario_id,
-      total,
+      totalConDescuento,
+      totalSinDescuento,
       numero_factura,
       fecha_hora,
     };

@@ -2,11 +2,19 @@ const db = require("../db");
 const ItemVenta = require("./itemsVentaModel");
 
 class Venta {
-  constructor(cliente_id, usuario_id, fecha_hora, total, itemsAgregados) {
+  constructor(
+    cliente_id,
+    usuario_id,
+    fecha_hora,
+    totalConDescuento,
+    totalSinDescuento,
+    itemsAgregados
+  ) {
     this.cliente_id = cliente_id;
     this.usuario_id = usuario_id;
     this.fecha_hora = fecha_hora;
-    this.total = total;
+    this.totalConDescuento = totalConDescuento;
+    this.totalSinDescuento = totalSinDescuento;
     this.itemsAgregados = itemsAgregados; // Array de items asociados a la venta
   }
 
@@ -118,12 +126,13 @@ class Venta {
     // Primero, insertamos la venta
     const numeroFactura = nuevaVenta.numero_factura.toString().padStart(9, "0");
     db.query(
-      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, numero_factura) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total,total_sin_descuento, numero_factura) VALUES (?, ?, ?, ?, ?)",
       [
         nuevaVenta.cliente_id,
         nuevaVenta.usuario_id,
         nuevaVenta.fecha_hora,
-        nuevaVenta.total,
+        nuevaVenta.totalConDescuento,
+        nuevaVenta.totalSinDescuento,
         numeroFactura,
       ],
       (error, resultadoVenta) => {
