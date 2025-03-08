@@ -24,7 +24,7 @@ class Cliente {
       FROM clientes as c
       LEFT JOIN obras_sociales as o on o.obra_social_id = c.obra_social_id
       LEFT JOIN ciudades as ci on ci.ciudad_id = c.ciudad_id
-      WHERE (c.nombre LIKE ? OR c.apellido LIKE ? OR c.dni LIKE ?)
+      WHERE deleted_at is NULL and (c.nombre LIKE ? OR c.apellido LIKE ? OR c.dni LIKE ?)
     `;
 
     const params = [searchQuery, searchQuery, searchQuery];
@@ -46,7 +46,7 @@ class Cliente {
     return db.query(query, params, callback);
   }
 
-  static agregarCliente(nuevoCliente, callback) {
+  static agregarCliente(nuevoCliente, usuario_id, callback) {
     return db.query(
       "INSERT INTO clientes (nombre, apellido, dni, obra_social_id, ciudad_id) VALUES (?, ?, ?, ?, ?)",
       [
@@ -56,28 +56,104 @@ class Cliente {
         nuevoCliente.obra_social_id,
         nuevoCliente.ciudad_id,
       ],
-      callback
+      (err, result) => {
+        if (err) {
+          return callback(err, null);
+        }
+        db.query(
+          `INSERT INTO auditoria_clientes (cliente_id, accion, detalle_cambio, fecha_movimiento, usuario_id) VALUES (?, 'CREAR', 'Se ha creado un nuevo cliente ${nuevoCliente.nombre} ${nuevoCliente.apellido}', NOW(), ?)`,
+          [result.insertId, usuario_id], // usuario_id por defecto 1 si no está disponible
+          (err) => {
+            if (err) {
+              console.error("Error al registrar en auditoría:", err);
+            }
+          }
+        );
+        callback(null, { id: result.insertId, ...nuevoCliente });
+      }
     );
   }
 
   static actualizarCliente(cliente_id, cliente, callback) {
-    return db.query(
-      "UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, obra_social_id = ?, ciudad_id = ? WHERE cliente_id = ?",
-      [
-        cliente.nombre,
-        cliente.apellido,
-        cliente.dni,
-        cliente.obra_social_id,
-        cliente.ciudad_id,
-        parseInt(cliente_id),
-      ],
-      callback
+    db.query(
+      "SELECT * FROM clientes WHERE cliente_id = ?",
+      [cliente_id],
+      (err, resultados) => {
+        if (err) {
+          return callback(err, null);
+        }
+
+        if (resultados.length === 0) {
+          return callback(new Error("Cliente no encontrado"), null);
+        }
+
+        const clienteActual = resultados[0];
+        console.log("cliente oikd", cliente);
+        console.log("clienteActual", clienteActual);
+        let detalle_cambio = "";
+
+        // 2️⃣ Comparar campo por campo y generar la descripción del cambio
+        if (cliente.nombre !== clienteActual.nombre) {
+          detalle_cambio += `Nombre: ${clienteActual.nombre} → ${cliente.nombre}; `;
+        }
+        if (cliente.apellido !== clienteActual.apellido) {
+          detalle_cambio += `Apellido: ${clienteActual.apellido} → ${cliente.apellido}; `;
+        }
+        if (cliente.dni !== clienteActual.dni) {
+          detalle_cambio += `DNI: ${clienteActual.dni} → ${cliente.dni}; `;
+        }
+        if (cliente.obra_social_id !== clienteActual.obra_social_id) {
+          detalle_cambio += `Obra Social: ${clienteActual.obra_social_id} → ${cliente.obra_social_id}; `;
+        }
+        if (cliente.ciudad_id !== clienteActual.ciudad_id) {
+          detalle_cambio += `Ciudad: ${clienteActual.ciudad_id} → ${cliente.ciudad_id}; `;
+        }
+
+        db.query(
+          "UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, obra_social_id = ?, ciudad_id = ? WHERE cliente_id = ?",
+          [
+            cliente.nombre,
+            cliente.apellido,
+            cliente.dni,
+            cliente.obra_social_id,
+            cliente.ciudad_id,
+            parseInt(cliente_id),
+          ],
+          callback
+        );
+        if (detalle_cambio !== "") {
+          db.query(
+            "INSERT INTO auditoria_clientes (cliente_id, accion, detalle_cambio, fecha_movimiento, usuario_id) VALUES (?, 'ACTUALIZAR', ?, NOW(), ?)",
+            [cliente_id, detalle_cambio, cliente.usuario_id], // usuario_id por defecto 1 si no está disponible
+            (err) => {
+              if (err) {
+                console.error("Error al registrar en auditoría:", err);
+              }
+            }
+          );
+        }
+      }
     );
   }
 
-  static eliminarCliente(clienteID, callback) {
+  static eliminarCliente(
+    clienteID,
+    usuario_id,
+    clienteNombre,
+    clienteApellido,
+    callback
+  ) {
+    db.query(
+      `INSERT INTO auditoria_clientes (cliente_id, accion, fecha_movimiento,detalle_cambio, usuario_id) VALUES (?, 'ELIMINAR', NOW(),'Se ha eliminado cliente ${clienteNombre} ${clienteApellido}',?)`,
+      [clienteID, usuario_id],
+      (err) => {
+        if (err) {
+          console.error("Error al registrar en auditoría:", err);
+        }
+      }
+    );
     return db.query(
-      "DELETE FROM clientes WHERE cliente_id = ?",
+      "UPDATE clientes SET deleted_at = NOW() WHERE cliente_id = ?",
       [clienteID],
       callback
     );

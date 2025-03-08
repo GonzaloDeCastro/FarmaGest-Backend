@@ -26,7 +26,7 @@ class Usuario {
     let query = `
     SELECT u.usuario_id, u.nombre as Nombre, u.apellido as Apellido, u.correo as Correo,  r.rol_id, r.rol as Rol FROM usuarios as u
     LEFT JOIN roles as r on r.rol_id = u.rol_id
-    WHERE (nombre LIKE ? OR apellido LIKE ? OR correo LIKE ?)
+    WHERE deleted_at is NULL and (nombre LIKE ? OR apellido LIKE ? OR correo LIKE ?)
   `;
 
     // Agregar condición para filtrar por rol si rolID no es 0
@@ -126,7 +126,7 @@ class Usuario {
 
   static eliminarUsuario(usuarioID, callback) {
     return db.query(
-      "DELETE FROM usuarios WHERE usuario_id = ?",
+      "UPDATE usuarios SET deleted_at = NOW() WHERE usuario_id = ?",
       [usuarioID],
       callback
     );

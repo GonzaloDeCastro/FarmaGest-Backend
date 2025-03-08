@@ -13,7 +13,7 @@ module.exports = () => {
   router.put("/:id", clientesController.actualizarCliente);
 
   // Eliminar un cliente existente
-  router.delete("/:id", clientesController.eliminarCliente);
+  router.put("/delete/:id", clientesController.eliminarCliente);
 
   // Obtener todas las obras sociales
   router.get("/ciudades", clientesController.obtenerCiudades);

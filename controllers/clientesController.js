@@ -17,7 +17,8 @@ const clientesController = {
   },
 
   agregarCliente: (req, res) => {
-    const { nombre, apellido, dni, obra_social_id, ciudad_id } = req.body;
+    const { nombre, apellido, dni, obra_social_id, ciudad_id, usuario_id } =
+      req.body;
     const nuevoCliente = new Cliente(
       nombre,
       apellido,
@@ -26,7 +27,7 @@ const clientesController = {
       ciudad_id
     );
 
-    Cliente.agregarCliente(nuevoCliente, (err, resultado) => {
+    Cliente.agregarCliente(nuevoCliente, usuario_id, (err, resultado) => {
       if (err) {
         console.error("Error al agregar cliente:", err);
         res.status(500).json({ mensaje: "Error al agregar cliente" });
@@ -48,20 +49,30 @@ const clientesController = {
   },
 
   eliminarCliente: (req, res) => {
+    console.log(req.body);
     const clienteID = req.params.id;
+    const usuario_id = req.body.usuario_id;
+    const clienteNombre = req.body.Nombre;
+    const clienteApellido = req.body.Apellido;
 
-    Cliente.eliminarCliente(clienteID, (err, resultado) => {
-      if (err) {
-        console.error("Error al eliminar cliente:", err);
-        res.status(500).json({ mensaje: "Error al eliminar cliente" });
-      } else {
-        if (resultado.affectedRows > 0) {
-          res.json({ mensaje: "Cliente eliminado correctamente" });
+    Cliente.eliminarCliente(
+      clienteID,
+      usuario_id,
+      clienteNombre,
+      clienteApellido,
+      (err, resultado) => {
+        if (err) {
+          console.error("Error al eliminar cliente:", err);
+          res.status(500).json({ mensaje: "Error al eliminar cliente" });
         } else {
-          res.status(404).json({ mensaje: "Cliente no encontrado" });
+          if (resultado.affectedRows > 0) {
+            res.json({ mensaje: "Cliente eliminado correctamente" });
+          } else {
+            res.status(404).json({ mensaje: "Cliente no encontrado" });
+          }
         }
       }
-    });
+    );
   },
 
   obtenerObrasSociales: (req, res) => {

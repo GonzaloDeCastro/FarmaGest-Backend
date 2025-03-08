@@ -25,7 +25,7 @@ class Producto {
       SELECT p.producto_id, p.nombre as Nombre, p.codigo as Codigo, p.marca as Marca, p.stock as Stock, p.precio as Precio, c.categoria_id, c.nombre as Categoria 
       FROM productos as p
       LEFT JOIN categorias as c on c.categoria_id = p.categoria_id
-      WHERE (p.nombre LIKE ? OR p.codigo LIKE ? OR p.marca LIKE ?)
+      WHERE p.deleted_at is NULL and (p.nombre LIKE ? OR p.codigo LIKE ? OR p.marca LIKE ?)
     `;
     const params = [searchQuery, searchQuery, searchQuery];
     query += ` LIMIT ? OFFSET ?`;
@@ -43,6 +43,7 @@ class Producto {
         }
       );
     }
+    console.log(query);
     return db.query(query, params, callback);
   }
 
@@ -160,7 +161,7 @@ class Producto {
     );
 
     return db.query(
-      "DELETE FROM productos WHERE producto_id = ?",
+      "UPDATE productos SET deleted_at = NOW() WHERE producto_id = ?",
       [producto_id],
       callback
     );

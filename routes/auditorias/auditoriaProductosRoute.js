@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auditoriaProductosController = require("../controllers/auditoriaProductosController");
+const auditoriaProductosController = require("../../controllers/auditoria/auditoriaProductosController");
 
 module.exports = () => {
   // Obtener todas las auditorias de productos

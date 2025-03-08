@@ -1,4 +1,4 @@
-const db = require("../db");
+const db = require("../../db");
 
 class AuditoriaProductos {
   constructor(
@@ -26,9 +26,10 @@ class AuditoriaProductos {
     const offset = (page - 1) * pageSize;
     const searchQuery = search ? `%${search}%` : "%";
     let query = `
-    SELECT a.producto_id as ProductoID , a.fecha_movimiento as Fecha, a.accion as Accion, a.detalle_cambio as Detalle,
+    SELECT p.nombre as Producto , a.fecha_movimiento as Fecha, a.accion as Accion, a.detalle_cambio as Detalle,
     u.correo as Usuario FROM auditoria_productos as a 
     LEFT JOIN usuarios as u ON a.usuario_id = u.usuario_id
+    LEFT JOIN productos as p ON a.producto_id = p.producto_id
     WHERE (a.detalle_cambio LIKE ? OR u.correo LIKE ?  or a.fecha_movimiento LIKE ?)
     ORDER BY a.fecha_movimiento DESC`;
     const params = [searchQuery, searchQuery, searchQuery];

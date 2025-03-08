@@ -69,7 +69,7 @@ const productosController = {
     const productoID = req.params.id;
     const usuario_id = req.body.usuario_id;
     const productoNombre = req.body.Nombre;
-    const productoCodigo = req.body.CodigoFecha;
+    const productoCodigo = req.body.Codigo;
 
     Producto.eliminarProducto(
       productoID,

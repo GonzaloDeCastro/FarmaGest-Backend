@@ -1,4 +1,4 @@
-const AuditoriaProductos = require("../models/auditoriaProductosModel");
+const AuditoriaProductos = require("../../models/auditorias/auditoriaProductosModel");
 
 const auditoriaProductosController = {
   obtenerAuditoriaProductos: (req, res) => {
@@ -11,10 +11,10 @@ const auditoriaProductosController = {
       search,
       (err, auditoriaProductos) => {
         if (err) {
-          console.error("Error al obtener auditoria productos:", err);
+          console.error("Error al obtener auditoria clientes:", err);
           res
             .status(500)
-            .json({ mensaje: "Error al obtener auditoria productos" });
+            .json({ mensaje: "Error al obtener auditoria clientes" });
         } else {
           res.json(auditoriaProductos);
         }
