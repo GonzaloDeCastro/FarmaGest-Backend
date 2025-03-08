@@ -27,7 +27,8 @@ class Venta {
 
     const queryVentas = `
       SELECT v.venta_id, v.fecha_hora,v.numero_factura, c.nombre AS cliente_nombre, 
-      c.apellido AS cliente_apellido, u.nombre AS usuario_nombre,u.apellido AS usuario_apellido, v.total
+      c.apellido AS cliente_apellido, u.nombre AS usuario_nombre,u.apellido AS usuario_apellido,
+      v.total, v.total_sin_descuento, v.descuento
       FROM ventas v
       JOIN clientes c ON v.cliente_id = c.cliente_id
       JOIN usuarios u ON v.usuario_id = u.usuario_id
@@ -85,7 +86,7 @@ class Venta {
 
   static obtenerVentaConItemsPorId(venta_id, callback) {
     const queryVenta = `
-      SELECT v.venta_id, v.fecha_hora, v.total, 
+      SELECT v.venta_id, v.fecha_hora, v.total, v.total_sin_descuento, v.descuento,
       c.nombre AS cliente_nombre,
       c.apellido AS cliente_apellido, 
       u.nombre AS usuario_nombre,
@@ -126,13 +127,14 @@ class Venta {
     // Primero, insertamos la venta
     const numeroFactura = nuevaVenta.numero_factura.toString().padStart(9, "0");
     db.query(
-      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total,total_sin_descuento, numero_factura) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, total_sin_descuento, descuento, numero_factura) VALUES (?, ?,?, ?, ?, ?, ?)",
       [
         nuevaVenta.cliente_id,
         nuevaVenta.usuario_id,
         nuevaVenta.fecha_hora,
         nuevaVenta.totalConDescuento,
         nuevaVenta.totalSinDescuento,
+        nuevaVenta.descuento,
         numeroFactura,
       ],
       (error, resultadoVenta) => {

@@ -59,6 +59,7 @@ const ventasController = {
       usuario_id,
       totalConDescuento,
       totalSinDescuento,
+      descuento,
       itemsAgregados,
       numero_factura,
       fecha_hora,
@@ -68,6 +69,7 @@ const ventasController = {
       usuario_id,
       totalConDescuento,
       totalSinDescuento,
+      descuento,
       numero_factura,
       fecha_hora,
     };
