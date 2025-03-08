@@ -24,7 +24,7 @@ class Cliente {
       FROM clientes as c
       LEFT JOIN obras_sociales as o on o.obra_social_id = c.obra_social_id
       LEFT JOIN ciudades as ci on ci.ciudad_id = c.ciudad_id
-      WHERE deleted_at is NULL and (c.nombre LIKE ? OR c.apellido LIKE ? OR c.dni LIKE ?)
+      WHERE c.deleted_at is NULL and (c.nombre LIKE ? OR c.apellido LIKE ? OR c.dni LIKE ?)
     `;
 
     const params = [searchQuery, searchQuery, searchQuery];

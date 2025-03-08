@@ -6,6 +6,7 @@ const clientesController = {
     const pageSize = parseInt(req.query.pageSize) || 99;
     const search = req.query.search || "";
     const sesion = req.query.sesion;
+    console.log(page, pageSize, search, sesion);
     Cliente.obtenerClientes(page, pageSize, search, sesion, (err, clientes) => {
       if (err) {
         console.error("Error al obtener clientes:", err);
