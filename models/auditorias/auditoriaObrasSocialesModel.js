@@ -1,23 +1,23 @@
 const db = require("../../db");
 
-class AuditoriaClientes {
+class AuditoriaObrasSociales {
   constructor(
     nombre,
-    cliente_id,
+    obra_social_id,
     accion,
     detalle_cambio,
     fecha_movimiento,
     usuario_id
   ) {
     this.nombre = nombre;
-    this.cliente_id = cliente_id;
+    this.obra_social_id = obra_social_id;
     this.accion = accion;
     this.detalle_cambio = detalle_cambio;
     this.fecha_movimiento = fecha_movimiento;
     this.usuario_id = usuario_id;
   }
 
-  static obtenerAuditoriaClientes(
+  static obtenerAuditoriaObrasSociales(
     page = 0,
     pageSize = 6,
     search = "",
@@ -26,10 +26,10 @@ class AuditoriaClientes {
     const offset = (page - 1) * pageSize;
     const searchQuery = search ? `%${search}%` : "%";
     let query = `
-  SELECT CONCAT(p.nombre, ' ', p.apellido) as Nombre , a.fecha_movimiento as Fecha, a.accion as Accion, a.detalle_cambio as Detalle,
-    u.correo as Usuario FROM auditoria_clientes as a 
+    SELECT p.obra_social as Nombre , a.fecha_movimiento as Fecha, a.accion as Accion, a.detalle_cambio as Detalle,
+    u.correo as Usuario FROM auditoria_obras_sociales as a 
     LEFT JOIN usuarios as u ON a.usuario_id = u.usuario_id
-    LEFT JOIN clientes as p ON a.cliente_id = p.cliente_id
+    LEFT JOIN obras_sociales as p ON a.obra_social_id = p.obra_social_id
     WHERE (a.detalle_cambio LIKE ? OR u.correo LIKE ?  or a.fecha_movimiento LIKE ?)
     ORDER BY a.fecha_movimiento DESC`;
     const params = [searchQuery, searchQuery, searchQuery];
@@ -39,4 +39,4 @@ class AuditoriaClientes {
   }
 }
 
-module.exports = AuditoriaClientes;
+module.exports = AuditoriaObrasSociales;

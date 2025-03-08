@@ -13,7 +13,7 @@ module.exports = () => {
   router.put("/:id", obrasSocialesController.actualizarObraSocial);
 
   // Eliminar una obra social existente
-  router.delete("/:id", obrasSocialesController.eliminarObraSocial);
+  router.put("/delete/:id", obrasSocialesController.eliminarObraSocial);
 
   return router;
 };

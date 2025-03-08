@@ -23,7 +23,7 @@ const obrasSocialesController = {
   },
 
   agregarObraSocial: (req, res) => {
-    const { obra_social, plan, descuento, codigo } = req.body;
+    const { obra_social, plan, descuento, codigo, usuario_id } = req.body;
     const nuevaObraSocial = new ObraSocial(
       obra_social,
       plan,
@@ -31,17 +31,21 @@ const obrasSocialesController = {
       codigo
     );
 
-    ObraSocial.agregarObraSocial(nuevaObraSocial, (err, resultado) => {
-      if (err) {
-        console.error("Error al agregar obra social:", err);
-        res.status(500).json({ mensaje: "Error al agregar obra social" });
-      } else {
-        res.status(201).json({
-          mensaje: "Obra social agregada correctamente",
-          obra_social_id: resultado.insertId,
-        });
+    ObraSocial.agregarObraSocial(
+      nuevaObraSocial,
+      usuario_id,
+      (err, resultado) => {
+        if (err) {
+          console.error("Error al agregar obra social:", err);
+          res.status(500).json({ mensaje: "Error al agregar obra social" });
+        } else {
+          res.status(201).json({
+            mensaje: "Obra social agregada correctamente",
+            obra_social_id: resultado.insertId,
+          });
+        }
       }
-    });
+    );
   },
 
   actualizarObraSocial: (req, res) => {
@@ -65,19 +69,26 @@ const obrasSocialesController = {
 
   eliminarObraSocial: (req, res) => {
     const obraSocialID = req.params.id;
+    const usuario_id = req.body.usuario_id;
+    const obraSocial = req.body.obra_social;
 
-    ObraSocial.eliminarObraSocial(obraSocialID, (err, resultado) => {
-      if (err) {
-        console.error("Error al eliminar obra social:", err);
-        res.status(500).json({ mensaje: "Error al eliminar obra social" });
-      } else {
-        if (resultado.affectedRows > 0) {
-          res.json({ mensaje: "Obra social eliminada correctamente" });
+    ObraSocial.eliminarObraSocial(
+      obraSocialID,
+      usuario_id,
+      obraSocial,
+      (err, resultado) => {
+        if (err) {
+          console.error("Error al eliminar obra social:", err);
+          res.status(500).json({ mensaje: "Error al eliminar obra social" });
         } else {
-          res.status(404).json({ mensaje: "Obra social no encontrada" });
+          if (resultado.affectedRows > 0) {
+            res.json({ mensaje: "Obra social eliminada correctamente" });
+          } else {
+            res.status(404).json({ mensaje: "Obra social no encontrada" });
+          }
         }
       }
-    });
+    );
   },
 };
 

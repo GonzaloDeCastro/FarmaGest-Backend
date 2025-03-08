@@ -88,8 +88,7 @@ class Cliente {
         }
 
         const clienteActual = resultados[0];
-        console.log("cliente oikd", cliente);
-        console.log("clienteActual", clienteActual);
+
         let detalle_cambio = "";
 
         // 2️⃣ Comparar campo por campo y generar la descripción del cambio
