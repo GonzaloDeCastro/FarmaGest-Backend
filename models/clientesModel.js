@@ -76,7 +76,10 @@ class Cliente {
 
   static actualizarCliente(cliente_id, cliente, callback) {
     db.query(
-      "SELECT * FROM clientes WHERE cliente_id = ?",
+      `SELECT c.cliente_id, c.nombre, c.apellido, c.dni, o.obra_social_id,o.obra_social,ci.ciudad_id, ci.ciudad
+      FROM clientes as c
+      LEFT JOIN obras_sociales as o on o.obra_social_id = c.obra_social_id
+      LEFT JOIN ciudades as ci on ci.ciudad_id = c.ciudad_id WHERE c.cliente_id = ?`,
       [cliente_id],
       (err, resultados) => {
         if (err) {
@@ -101,11 +104,11 @@ class Cliente {
         if (cliente.dni !== clienteActual.dni) {
           detalle_cambio += `DNI: ${clienteActual.dni} → ${cliente.dni}; `;
         }
-        if (cliente.obra_social_id !== clienteActual.obra_social_id) {
-          detalle_cambio += `Obra Social: ${clienteActual.obra_social_id} → ${cliente.obra_social_id}; `;
+        if (cliente.obra_social !== clienteActual.obra_social) {
+          detalle_cambio += `Obra Social: ${clienteActual.obra_social} → ${cliente.obra_social}; `;
         }
-        if (cliente.ciudad_id !== clienteActual.ciudad_id) {
-          detalle_cambio += `Ciudad: ${clienteActual.ciudad_id} → ${cliente.ciudad_id}; `;
+        if (cliente.Ciudad !== clienteActual.ciudad) {
+          detalle_cambio += `Ciudad: ${clienteActual.ciudad} → ${cliente.Ciudad}; `;
         }
 
         db.query(
