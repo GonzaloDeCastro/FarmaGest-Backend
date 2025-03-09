@@ -11,6 +11,7 @@ const obrasSocialesRoutes = require("./obrasSocialesRoute.js");
 const ventasRoutes = require("./ventasRoute.js");
 const reportesRoutes = require("./reportesRoute.js");
 const sesionesRoutes = require("./sesionesRoute.js");
+const authRoutes = require("./authRoute.js");
 
 router.use("/reportes/", reportesRoutes());
 router.use("/ventas/", ventasRoutes());
@@ -23,5 +24,7 @@ router.use("/auditoria-clientes/", auditoriaClientesRoutes());
 router.use("/auditoria-obras-sociales/", auditoriaObrasSocialesRoutes());
 router.use("/obras-sociales/", obrasSocialesRoutes());
 router.use("/sesiones/", sesionesRoutes());
+
+router.use("/auth/", authRoutes);
 
 module.exports = router;

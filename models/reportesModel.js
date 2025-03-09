@@ -25,12 +25,6 @@ class Reporte {
     let queryVentasPorFecha;
     const params = [dateSelectedFrom];
 
-    console.log(
-      dateSelectedFrom,
-      dateSelectedTo,
-      entitySelected,
-      clienteProductoVendedor
-    );
 
     if (dateSelectedTo) {
       // Si `dateSelectedTo` está definido

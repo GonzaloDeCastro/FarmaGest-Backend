@@ -43,7 +43,7 @@ class Producto {
         }
       );
     }
-    console.log(query);
+
     return db.query(query, params, callback);
   }
 

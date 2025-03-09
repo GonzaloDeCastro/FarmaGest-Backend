@@ -11,6 +11,9 @@ class Database {
         password: process.env.password,
         database: process.env.database,
         timezone: "Z",
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
       });
 
       this.connection.connect((err) => {

@@ -196,7 +196,7 @@ class Usuario {
           if (err) {
             return callback(err);
           }
-          console.log("match", match);
+
           if (!match) {
             // Contraseña incorrecta
             return callback(new Error("Correo o contraseña incorrectos"));
