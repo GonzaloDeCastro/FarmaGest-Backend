@@ -1,5 +1,22 @@
 const express = require("express");
 const router = express.Router();
+const db = require("../db");
+// Middleware para actualizar ultima_actividad de la sesión, si está presente
+router.use((req, res, next) => {
+  const sesion = req.headers["x-sesion-id"] || req.query.sesion || (req.body && req.body.sesion);
+  if (!sesion) return next();
+
+  db.query(
+    "UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?",
+    [sesion],
+    (err) => {
+      if (err) {
+        console.error("Error al actualizar ultima_actividad de la sesión:", err);
+      }
+      next();
+    }
+  );
+});
 const proveedoresRoutes = require("./proveedoresRoute.js");
 const productosRoutes = require("./productosRoute.js");
 const usuariosRoutes = require("./usuariosRoute.js");
