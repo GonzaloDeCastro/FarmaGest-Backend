@@ -38,18 +38,8 @@ class Usuario {
 
     query += ` LIMIT ? OFFSET ?`;
     params.push(pageSize, offset);
-    if (sesion) {
-      db.query(
-        `UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?`,
-        [sesion],
-        (err, resultado) => {
-          if (err) {
-            console.error("Error al insertar usuario:", err);
-            return callback(err);
-          }
-        }
-      );
-    }
+    
+    // La actualización de sesión ahora se maneja en el middleware de routes.js
     return db.query(query, params, callback);
   }
   static agregarUsuario(nuevoUsuario, callback) {

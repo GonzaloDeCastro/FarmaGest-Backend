@@ -73,18 +73,7 @@ class Venta {
             return { ...venta, itemsAgregados: itemsDeVenta };
           });
 
-          if (sesion) {
-            db.query(
-              `UPDATE sesiones SET ultima_actividad = NOW() WHERE sesion_id = ?`,
-              [sesion],
-              (err, resultado) => {
-                if (err) {
-                  console.error("Error al insertar usuario:", err);
-                  return callback(err);
-                }
-              }
-            );
-          }
+          // La actualización de sesión ahora se maneja en el middleware de routes.js
           callback(null, ventasConItems);
         });
       }
