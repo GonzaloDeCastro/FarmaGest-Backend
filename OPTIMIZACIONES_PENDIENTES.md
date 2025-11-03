@@ -2,6 +2,8 @@
 
 ## 📋 Resumen Ejecutivo
 
+Estado actual: puntos 1-4 completados y sincronizados en main.
+
 Esta revisión identifica los principales puntos de optimización pendientes en el código del backend. Se han identificado **8 áreas críticas** que requieren atención para mejorar el rendimiento, la confiabilidad y la escalabilidad de la aplicación.
 
 ---
