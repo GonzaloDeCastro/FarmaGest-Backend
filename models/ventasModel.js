@@ -49,14 +49,21 @@ class Venta {
 
         const ventaIds = ventas.map((venta) => venta.venta_id);
 
+        // Crear placeholders dinámicos para la query IN()
+        // Si no hay IDs, retornar vacío directamente
+        if (ventaIds.length === 0) {
+          return callback(null, ventas.map((venta) => ({ ...venta, itemsAgregados: [] })));
+        }
+
+        const placeholders = ventaIds.map(() => "?").join(",");
         const queryItems = `
         SELECT iv.venta_id, iv.producto_id, p.nombre AS producto_nombre, iv.cantidad, iv.precio_unitario, iv.total_item
         FROM items_venta iv
         JOIN productos p ON iv.producto_id = p.producto_id
-        WHERE iv.venta_id IN (?)
+        WHERE iv.venta_id IN (${placeholders})
       `;
 
-        db.query(queryItems, [ventaIds], (err, itemsAgregados) => {
+        db.query(queryItems, ventaIds, (err, itemsAgregados) => {
           if (err) return callback(err);
 
           const ventasConItems = ventas.map((venta) => {
