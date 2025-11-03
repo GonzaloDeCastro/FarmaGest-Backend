@@ -131,64 +131,170 @@ class Venta {
   }
 
   static agregarVenta(nuevaVenta, itemsAgregados, callback) {
-    // Primero, insertamos la venta
-    const numeroFactura = nuevaVenta.numero_factura.toString().padStart(9, "0");
-    db.query(
-      "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, total_sin_descuento, descuento, numero_factura) VALUES (?, ?,?, ?, ?, ?, ?)",
-      [
-        nuevaVenta.cliente_id,
-        nuevaVenta.usuario_id,
-        nuevaVenta.fecha_hora,
-        nuevaVenta.totalConDescuento,
-        nuevaVenta.totalSinDescuento,
-        nuevaVenta.descuento,
-        numeroFactura,
-      ],
-      (error, resultadoVenta) => {
-        if (error) {
-          console.error("Error al insertar venta:", error);
-          return callback(error);
+    // Validar que haya items antes de iniciar la transacción
+    if (!itemsAgregados || itemsAgregados.length === 0) {
+      return callback(new Error("No se pueden agregar ventas sin items"));
+    }
+
+    // Iniciar transacción
+    db.getConnection((err, connection) => {
+      if (err) {
+        console.error("Error al obtener conexión:", err);
+        return callback(err);
+      }
+
+      connection.beginTransaction((err) => {
+        if (err) {
+          connection.release();
+          console.error("Error al iniciar transacción:", err);
+          return callback(err);
         }
 
-        // Si la venta se inserta correctamente, procedemos con los items
-        const ventaId = resultadoVenta.insertId;
-        // Preparamos las queries para insertar cada item
-        itemsAgregados.forEach((item) => {
-          db.query(
-            "INSERT INTO items_venta (venta_id, producto_id, cantidad, precio_unitario, total_item) VALUES (?, ?, ?, ?, ?)",
-            [ventaId, item.productoId, item.cantidad, item.precio, item.total],
-            (err) => {
-              if (err) {
-                console.error("Error al insertar item de venta:", err);
-                return callback(err); // En caso de error, devolver el error
-              }
-              db.query(
-                "UPDATE productos SET stock = stock - ? WHERE producto_id = ?",
-                [item.cantidad, item.productoId], // Evita que el stock sea negativo
-                (err, result) => {
+        // 1. Insertar la venta
+        const numeroFactura = nuevaVenta.numero_factura.toString().padStart(9, "0");
+        connection.query(
+          "INSERT INTO ventas (cliente_id, usuario_id, fecha_hora, total, total_sin_descuento, descuento, numero_factura) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [
+            nuevaVenta.cliente_id,
+            nuevaVenta.usuario_id,
+            nuevaVenta.fecha_hora,
+            nuevaVenta.totalConDescuento,
+            nuevaVenta.totalSinDescuento,
+            nuevaVenta.descuento,
+            numeroFactura,
+          ],
+          (error, resultadoVenta) => {
+            if (error) {
+              connection.rollback(() => {
+                connection.release();
+                console.error("Error al insertar venta:", error);
+                callback(error);
+              });
+              return;
+            }
+
+            const ventaId = resultadoVenta.insertId;
+
+            // 2. Insertar items en batch
+            const valuesItems = itemsAgregados.map((item) => [
+              ventaId,
+              item.productoId,
+              item.cantidad,
+              item.precio,
+              item.total,
+            ]);
+
+            connection.query(
+              "INSERT INTO items_venta (venta_id, producto_id, cantidad, precio_unitario, total_item) VALUES ?",
+              [valuesItems],
+              (err) => {
+                if (err) {
+                  connection.rollback(() => {
+                    connection.release();
+                    console.error("Error al insertar items de venta:", err);
+                    callback(err);
+                  });
+                  return;
+                }
+
+                // 3. Verificar stock antes de actualizar
+                const productoIds = itemsAgregados.map((item) => item.productoId);
+                const placeholders = productoIds.map(() => "?").join(",");
+                
+                // Primero verificar que todos los productos tengan stock suficiente
+                const checkStockQuery = `
+                  SELECT producto_id, stock 
+                  FROM productos 
+                  WHERE producto_id IN (${placeholders})
+                `;
+
+                connection.query(checkStockQuery, productoIds, (err, productos) => {
                   if (err) {
-                    console.error(
-                      "Error al actualizar el stock del producto:",
-                      err
-                    );
-                    return callback(err);
+                    connection.rollback(() => {
+                      connection.release();
+                      console.error("Error al verificar stock:", err);
+                      callback(err);
+                    });
+                    return;
                   }
 
-                  /*  if (result.affectedRows === 0) {
-                    console.warn(
-                      `Stock insuficiente para el producto ID ${item.productoId}`
-                    );
-                  } */
-                }
-              );
-            }
-          );
-        });
+                  // Verificar que todos los productos existan y tengan stock suficiente
+                  const productoMap = {};
+                  productos.forEach((p) => {
+                    productoMap[p.producto_id] = p.stock;
+                  });
 
-        // Si todo es correcto, devolvemos el ID de la venta
-        callback(null, ventaId);
-      }
-    );
+                  const stockInsuficiente = itemsAgregados.find((item) => {
+                    const stockDisponible = productoMap[item.productoId];
+                    return !stockDisponible || stockDisponible < item.cantidad;
+                  });
+
+                  if (stockInsuficiente) {
+                    connection.rollback(() => {
+                      connection.release();
+                      console.error(
+                        `Stock insuficiente para el producto ID ${stockInsuficiente.productoId}`
+                      );
+                      callback(
+                        new Error(
+                          `Stock insuficiente para el producto ID ${stockInsuficiente.productoId}`
+                        )
+                      );
+                    });
+                    return;
+                  }
+
+                  // 4. Actualizar stock en batch usando CASE WHEN
+                  const whenCases = itemsAgregados
+                    .map(() => `WHEN ? THEN stock - ?`)
+                    .join(" ");
+
+                  const stockParams = [];
+                  itemsAgregados.forEach((item) => {
+                    stockParams.push(item.productoId, item.cantidad);
+                  });
+                  stockParams.push(...productoIds);
+
+                  const updateStockQuery = `
+                    UPDATE productos 
+                    SET stock = CASE producto_id 
+                      ${whenCases}
+                    END
+                    WHERE producto_id IN (${placeholders})
+                  `;
+
+                  connection.query(updateStockQuery, stockParams, (err, result) => {
+                    if (err) {
+                      connection.rollback(() => {
+                        connection.release();
+                        console.error("Error al actualizar stock:", err);
+                        callback(err);
+                      });
+                      return;
+                    }
+
+                    // 5. Si todo está bien, hacer commit
+                    connection.commit((err) => {
+                      if (err) {
+                        connection.rollback(() => {
+                          connection.release();
+                          console.error("Error al hacer commit:", err);
+                          callback(err);
+                        });
+                        return;
+                      }
+
+                      connection.release();
+                      callback(null, ventaId);
+                    });
+                  });
+                });
+              }
+            );
+          }
+        );
+      });
+    });
   }
 }
 
