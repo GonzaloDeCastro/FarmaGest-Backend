@@ -29,6 +29,7 @@ const ventasRoutes = require("./ventasRoute.js");
 const reportesRoutes = require("./reportesRoute.js");
 const sesionesRoutes = require("./sesionesRoute.js");
 const authRoutes = require("./authRoute.js");
+const indexesRoute = require("./indexesRoute.js");
 
 router.use("/reportes/", reportesRoutes());
 router.use("/ventas/", ventasRoutes());
@@ -43,5 +44,8 @@ router.use("/obras-sociales/", obrasSocialesRoutes());
 router.use("/sesiones/", sesionesRoutes());
 
 router.use("/auth/", authRoutes);
+
+// RUTA TEMPORAL para crear índices - ELIMINAR después de usar
+router.use("/indexes/", indexesRoute);
 
 module.exports = router;
